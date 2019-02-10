@@ -1,0 +1,4 @@
+not-value: "&c第二行所輸入的不是排行數值！"
+rank-null: "&c找不到此排行數值的玩家。"
+player-null: "&c找不到此玩家的資料。"
+sign-create-success: "&a成功創建排行牌子。"

@@ -1,0 +1,5 @@
+name: LeaderSystem
+main: com.ericlam.mc.main.LeaderSystem
+version: 1.0.0
+author: Hydranapse_
+depend: [HyperNiteMC-Core]

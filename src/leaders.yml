@@ -1,0 +1,108 @@
+gsg-kills:
+  database: "crystal_gsg"
+  table: "gamestats"
+  column: "Kills"
+  limit: 50
+  player-name: "player_name"
+  player-uuid: "player_uuid"
+  data-show: ""
+  sign:
+    - "&4#<rank>"
+    - "&e<player>"
+    - "&c殺敵: &b<data>"
+    - "123"
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+inf-kills:
+  database: "crystal_mcinf"
+  table: "McInfected"
+  column: "Kills"
+  limit: 50
+  player-name: ""
+  player-uuid: "UUID"
+  data-show: ""
+  sign:
+    - "&4#<rank>"
+    - "&e<player>"
+    - "&c殺敵: &b<data>"
+    - ""
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+gsg-wins:
+  database: "crystal_gsg"
+  table: "gamestats"
+  column: "Wins"
+  limit: 50
+  player-name: "player_name"
+  player-uuid: "player_uuid"
+  data-show: ""
+  sign:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+votes:
+  database: "crystal_vote"
+  table: "votes"
+  column: "votes"
+  limit: 50
+  player-name: "last_name"
+  player-uuid: "uuid"
+  data-show: ""
+  sign:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+money:
+  database: "crystal_interconomy"
+  table: "interconomy_userdata"
+  column: "money"
+  limit: 50
+  player-name: ""
+  player-uuid: "uuid"
+  data-show: ""
+  sign:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+inf-wins:
+  database: "crystal_mcinf"
+  table: "McInfected"
+  column: "Wins"
+  limit: 50
+  player-name: ""
+  player-uuid: "UUID"
+  data-show: ""
+  sign:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""
+  inv-lores:
+    - "# <rank>"
+    - "<player>"
+    - "殺敵: <data>"
+    - ""

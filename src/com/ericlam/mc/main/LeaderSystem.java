@@ -1,20 +1,30 @@
 package com.ericlam.mc.main;
 
+import com.ericlam.mc.commandhandler.LeaderSystemCommand;
 import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.listener.onSignCreated;
+import com.ericlam.mc.listener.onInventoryEvent;
+import com.ericlam.mc.listener.onSignEvent;
 import com.ericlam.mc.manager.LeaderBoardManager;
-import org.bukkit.plugin.Plugin;
+import com.ericlam.mc.manager.LeaderInventoryManager;
+import com.ericlam.mc.placeholders.PlaceholderHook;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeaderSystem extends JavaPlugin {
-    public static Plugin plugin;
     @Override
     public void onEnable() {
-        plugin = this;
         new ConfigManager(this).loadConfig();
         this.getLogger().info("LeaderSystem Enabled.");
-        this.getServer().getPluginManager().registerEvents(new onSignCreated(this),this);
+        this.getServer().getPluginManager().registerEvents(new onSignEvent(this), this);
+        this.getServer().getPluginManager().registerEvents(new onInventoryEvent(), this);//this can be removed if caxerx onclick method fixed.
+        this.getCommand("leadersystem").setExecutor(new LeaderSystemCommand(this));
         LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
-        leaderBoardManager.startUpdateScheduler();
+        LeaderInventoryManager leaderInventoryManager = LeaderInventoryManager.getInstance();
+        leaderBoardManager.startUpdateScheduler(this);
+        leaderBoardManager.startSignUpdate(this);
+        leaderInventoryManager.inventoryUpdateScheduler(this);
+        if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            this.getLogger().info("Found PlaceholderAPI! registering placeholders...");
+            new PlaceholderHook(this).register();
+        }
     }
 }

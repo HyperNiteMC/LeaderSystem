@@ -9,7 +9,6 @@ public class Board {
     private int rank;
     private UUID playerUUID;
     private String playerName;
-    private int data;
     private String dataShow;
 
     public Board(int rank, UUID playerUUID, String playerName, int data, String dataShow) {
@@ -26,7 +25,6 @@ public class Board {
         }else{
             this.playerName = playerName;
         }
-        this.data = data;
         this.dataShow = dataShow.isEmpty() ? data+"" : dataShow;
     }
 
@@ -40,10 +38,6 @@ public class Board {
 
     public String getPlayerName() {
         return playerName;
-    }
-
-    public int getData() {
-        return data;
     }
 
     public String getDataShow() {

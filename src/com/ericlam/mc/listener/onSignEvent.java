@@ -4,6 +4,7 @@ import com.ericlam.mc.config.ConfigManager;
 import com.ericlam.mc.main.LeaderSystem;
 import com.ericlam.mc.main.Utils;
 import com.ericlam.mc.manager.LeaderBoardManager;
+import com.ericlam.mc.manager.LeaderInventoryManager;
 import com.ericlam.mc.model.Board;
 import com.ericlam.mc.model.LeaderBoard;
 import com.hypernite.skin.PlayerHeadGetter;
@@ -13,18 +14,22 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
-public class onSignCreated implements Listener {
+public class onSignEvent implements Listener {
     private final Plugin plugin;
 
-    public onSignCreated(LeaderSystem plugin){
+    public onSignEvent(LeaderSystem plugin) {
         this.plugin = plugin;
     }
     @EventHandler
@@ -46,7 +51,7 @@ public class onSignCreated implements Listener {
         LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
         Bukkit.getScheduler().runTaskAsynchronously(plugin,()->{
             List<Board> boards = leaderBoardManager.getRanking(leaderBoard);
-            Board board = Utils.getBoardFromRank(boards,rank);
+            Board board = Utils.getBoard(boards, rank);
             if (board == null){
                 player.sendMessage(ConfigManager.rankNull);
                 return;
@@ -55,8 +60,10 @@ public class onSignCreated implements Listener {
                 player.sendMessage(ConfigManager.playerNull);
                 return;
             }
-            String base64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID());
+            player.sendMessage(ConfigManager.createSignSuccess);
+            String base64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID(), board.getPlayerName());
             Bukkit.getScheduler().runTask(plugin,()->{
+                if (sign.getType() != Material.WALL_SIGN) sign.setType(Material.WALL_SIGN);
                 Sign signState = (Sign) sign.getState();
                 for (int i = 0; i < 4; i++) {
                     String line = leaderBoard.getSigns().get(i)
@@ -75,8 +82,42 @@ public class onSignCreated implements Listener {
                 boolean walled = com.ericlam.utils.Utils.isWalled(headBlock);
                 if (!walled) headBlock = sign.getRelative(player.getFacing());
                 PlayerHeadGetter.setHeadBlock(base64,headBlock,walled,player.getFacing().getOppositeFace());
-                player.sendMessage(ConfigManager.createSignSuccess);
+                Location signLoc = sign.getLocation();
+                FileConfiguration signData = ConfigManager.signData;
+                String uid = Utils.uidGenerator();
+                signData.set(uid + ".item", item);
+                signData.set(uid + ".rank", rank);
+                signData.set(uid + ".location", signLoc);
+                signData.set(uid + ".head-location", headBlock.getLocation());
+                ConfigManager.saveSignData();
             });
         });
+    }
+
+    @EventHandler
+    public void onSignBreak(BlockBreakEvent e) {
+        if (e.getBlock().getType() != Material.WALL_SIGN) return;
+        Block sign = e.getBlock();
+        Location signLoc = sign.getLocation();
+        String uid = Utils.getUidFromLoc(signLoc);
+        if (uid == null) return;
+        FileConfiguration signData = ConfigManager.signData;
+        signData.set(uid, null);
+        ConfigManager.saveSignData();
+        e.getPlayer().sendMessage(ConfigManager.signRemoved);
+    }
+
+    @EventHandler
+    public void onSignClick(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.WALL_SIGN) return;
+        Player player = e.getPlayer();
+        Block sign = e.getClickedBlock();
+        String uid = Utils.getUidFromLoc(sign.getLocation());
+        if (uid == null) return;
+        String item = ConfigManager.signData.getString(uid + ".item");
+        LeaderBoard leaderBoard = Utils.getItem(item);
+        if (leaderBoard == null) return;
+        player.openInventory(LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard));
     }
 }

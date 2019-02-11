@@ -3,11 +3,18 @@ package com.ericlam.mc.model;
 import java.util.List;
 
 public class LeaderBoard {
-    private String item,database,table,column,playername,playeruuid,datashow;
-    private int limit;
+    private String item;
+    private String database;
+    private String table;
+    private String column;
+    private String playername;
+    private String playeruuid;
+    private String datashow;
+    private String invTitle;
+    private String invName;
     private List<String> signs,lores;
 
-    public LeaderBoard(String item, String database, String table, String column, String playername, String playeruuid, String datashow, int limit, List<String> signs, List<String> lores) {
+    public LeaderBoard(String item, String database, String table, String column, String playername, String playeruuid, String datashow, List<String> signs, List<String> lores, String invTitle, String invName) {
         this.item = item;
         this.database = database;
         this.table = table;
@@ -15,9 +22,18 @@ public class LeaderBoard {
         this.playername = playername;
         this.playeruuid = playeruuid;
         this.datashow = datashow;
-        this.limit = limit;
         this.signs = signs;
         this.lores = lores;
+        this.invTitle = invTitle;
+        this.invName = invName;
+    }
+
+    public String getInvTitle() {
+        return invTitle;
+    }
+
+    public String getInvName() {
+        return invName;
     }
 
     public List<String> getSigns() {
@@ -54,9 +70,5 @@ public class LeaderBoard {
 
     public String getDatashow() {
         return datashow;
-    }
-
-    public int getLimit() {
-        return limit;
     }
 }

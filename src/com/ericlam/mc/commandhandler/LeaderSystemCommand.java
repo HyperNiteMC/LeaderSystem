@@ -4,12 +4,14 @@ import com.ericlam.mc.config.ConfigManager;
 import com.ericlam.mc.main.LeaderSystem;
 import com.ericlam.mc.main.Utils;
 import com.ericlam.mc.manager.LeaderBoardManager;
+import com.ericlam.mc.manager.LeaderInventoryManager;
 import com.ericlam.mc.model.Board;
 import com.ericlam.mc.model.LeaderBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -58,11 +60,6 @@ public class LeaderSystemCommand implements CommandExecutor {
 
         Player player = (Player) commandSender;
 
-        if (!strings[0].equals("get")) {
-            player.sendMessage(ConfigManager.help);
-            return false;
-        }
-
         String item = strings[1];
         LeaderBoard leaderBoard = Utils.getItem(item);
 
@@ -71,31 +68,44 @@ public class LeaderSystemCommand implements CommandExecutor {
             return false;
         }
 
-        if (strings.length == 2) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
-                Board board = Utils.getBoard(boardList, player.getUniqueId());
-                if (board == null) {
-                    player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
-                    return;
+        switch (strings[0]) {
+            case "get":
+                if (strings.length == 2) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                        Board board = Utils.getBoard(boardList, player.getUniqueId());
+                        if (board == null) {
+                            player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
+                            return;
+                        }
+                        player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
+                    });
+                    return true;
+                } else {
+                    String target = strings[2];
+
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                        Board board = Utils.getBoard(boardList, target);
+                        if (board == null) {
+                            player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
+                            return;
+                        }
+                        player.sendMessage(ConfigManager.getStatisticPlayer.replaceAll("<player>", target).replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
+                    });
                 }
-                player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
-            });
-            return true;
+                return true;
+            case "inv":
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    Inventory inv = LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard);
+                    Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inv));
+                });
+                return true;
+            default:
+                player.sendMessage(ConfigManager.help);
+                break;
         }
 
-        String target = strings[2];
-
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
-            Board board = Utils.getBoard(boardList, target);
-            if (board == null) {
-                player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
-                return;
-            }
-            player.sendMessage(ConfigManager.getStatisticPlayer.replaceAll("<player>", target).replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
-        });
-
-        return true;
+        return false;
     }
 }

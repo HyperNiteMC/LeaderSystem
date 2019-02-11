@@ -6,8 +6,7 @@ replace LeaderHeads
 
 ![showcase4](https://cdn.discordapp.com/attachments/443679663739633674/544459319186292737/21d7c192ee15507a4e79b37e2b8c9063.png)
 
-
-![showcase1](https/gyazo.com/19cc4c2197d9f8b200ed3bccef088e72.gif)
+![fuckthisshit](https://gyazo.com/19cc4c2197d9f8b200ed3bccef088e72.gif)
 
 ![showcase2](https://gyazo.com/cc7bb4c1001c48b78e7fd22b8852946c.gif)
 

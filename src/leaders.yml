@@ -2,7 +2,6 @@ gsg-kills:
   database: "crystal_gsg"
   table: "gamestats"
   column: "Kills"
-  limit: 50
   player-name: "player_name"
   player-uuid: "player_uuid"
   data-show: ""
@@ -20,7 +19,6 @@ inf-kills:
   database: "crystal_mcinf"
   table: "McInfected"
   column: "Kills"
-  limit: 50
   player-name: ""
   player-uuid: "UUID"
   data-show: ""
@@ -29,7 +27,7 @@ inf-kills:
     - "&9<player>"
     - "&c殺敵: &b<data>"
     - ""
-  inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+  inv-title: "&6槍戰生化模式 &4- 殺敵排行"
   inv-name: "<player>"
   inv-lores:
     - "&c&lNo. &e&l<rank>"
@@ -38,71 +36,67 @@ gsg-wins:
   database: "crystal_gsg"
   table: "gamestats"
   column: "Wins"
-  limit: 50
   player-name: "player_name"
   player-uuid: "player_uuid"
   data-show: ""
   sign:
     - "# <rank>"
     - "<player>"
-    - "殺敵: <data>"
+    - "勝數: <data>"
     - ""
-  inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+  inv-title: "&6槍戰飢餓遊戲 &4- 勝數排行"
   inv-name: "<player>"
   inv-lores:
     - "&c&lNo. &e&l<rank>"
-    - "&b殺敵: <data>"
+    - "&b勝數: <data>"
 votes:
   database: "crystal_vote"
   table: "votes"
   column: "votes"
-  limit: 50
   player-name: "last_name"
   player-uuid: "uuid"
   data-show: ""
   sign:
     - "# <rank>"
     - "<player>"
-    - "殺敵: <data>"
+    - "票數: <data>"
     - ""
-  inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+  inv-title: "&6投票排行"
   inv-name: "<player>"
   inv-lores:
     - "&c&lNo. &e&l<rank>"
-    - "&b殺敵: <data>"
+    - "&b票數: <data>"
 money:
   database: "crystal_interconomy"
   table: "interconomy_userdata"
   column: "money"
-  limit: 50
   player-name: ""
   player-uuid: "uuid"
   data-show: ""
   sign:
     - "# <rank>"
     - "<player>"
-    - "殺敵: <data>"
+    - "金錢: <data>"
     - ""
-  inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+  inv-title: "&6金錢排行"
   inv-name: "<player>"
   inv-lores:
     - "&c&lNo. &e&l<rank>"
-    - "&b殺敵: <data>"
+    - "&b金錢: <data>"
 inf-wins:
   database: "crystal_mcinf"
   table: "McInfected"
   column: "Wins"
-  limit: 50
   player-name: ""
   player-uuid: "UUID"
   data-show: ""
   sign:
     - "# <rank>"
     - "<player>"
-    - "殺敵: <data>"
+    - "勝數: <data>"
     - ""
-  inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+  inv-title: "&6槍戰生化模式 &4- 勝利排行"
   inv-name: "<player>"
   inv-lores:
     - "&c&lNo. &e&l<rank>"
-    - "&b殺敵: <data>"
+    - "&b勝數: <data>"

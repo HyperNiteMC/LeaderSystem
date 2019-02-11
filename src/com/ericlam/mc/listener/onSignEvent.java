@@ -80,7 +80,13 @@ public class onSignEvent implements Listener {
                 final double z = sign.getZ();
                 Block headBlock = new Location(player.getWorld(),x,y+1,z).getBlock();
                 boolean walled = com.ericlam.utils.Utils.isWalled(headBlock);
-                if (!walled) headBlock = sign.getRelative(player.getFacing());
+                if (!walled) {
+                    Block signRelative = sign.getRelative(player.getFacing());
+                    final double yR = signRelative.getY();
+                    final double xR = signRelative.getX();
+                    final double zR = signRelative.getZ();
+                    headBlock = new Location(player.getWorld(), xR, yR + 1, zR).getBlock();
+                }
                 PlayerHeadGetter.setHeadBlock(base64,headBlock,walled,player.getFacing().getOppositeFace());
                 Location signLoc = sign.getLocation();
                 FileConfiguration signData = ConfigManager.signData;

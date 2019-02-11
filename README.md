@@ -1,7 +1,7 @@
 # LeaderSystem
 replace LeaderHeads
 
-![showcase1](https://gyazo.com/19cc4c2197d9f8b200ed3bccef088e72.gif)
+![showcase1](https://i.gyazo.com/19cc4c2197d9f8b200ed3bccef088e72.gif)
 
 ![showcase2](https://gyazo.com/cc7bb4c1001c48b78e7fd22b8852946c.gif)
 

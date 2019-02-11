@@ -8,7 +8,7 @@ gsg-kills:
   data-show: ""
   sign:
     - "&4#<rank>"
-    - "&e<player>"
+    - "&9<player>"
     - "&c殺敵: &b<data>"
     - ""
   inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"
@@ -26,7 +26,7 @@ inf-kills:
   data-show: ""
   sign:
     - "&4#<rank>"
-    - "&e<player>"
+    - "&9<player>"
     - "&c殺敵: &b<data>"
     - ""
   inv-title: "&6槍戰飢餓遊戲 &4- 殺敵排行"

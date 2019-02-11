@@ -76,7 +76,7 @@ public class LeaderSystemCommand implements CommandExecutor {
                 List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                 Board board = Utils.getBoard(boardList, player.getUniqueId());
                 if (board == null) {
-                    player.sendMessage(ConfigManager.notInLimit);
+                    player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
                     return;
                 }
                 player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));

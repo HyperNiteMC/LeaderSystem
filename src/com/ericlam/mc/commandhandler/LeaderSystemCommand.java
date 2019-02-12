@@ -76,7 +76,6 @@ public class LeaderSystemCommand implements CommandExecutor {
 
         switch (strings[0]) {
             case "get":
-                if (isAdmin(commandSender)) return false;
                 if (strings.length == 2) {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);

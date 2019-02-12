@@ -26,12 +26,12 @@ public class LeaderSystemCommand implements CommandExecutor {
         noPerm = cf.getPrefix() + cf.getNoPerm();
     }
 
-    private boolean isAdmin(CommandSender commandSender) {
+    private boolean isNotAdmin(CommandSender commandSender) {
         if (!commandSender.hasPermission("hypernite.admin")) {
             commandSender.sendMessage(noPerm);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -45,11 +45,10 @@ public class LeaderSystemCommand implements CommandExecutor {
         if (strings.length == 1) {
             switch (strings[0]) {
                 case "help":
-                    if (isAdmin(commandSender)) return false;
                     commandSender.sendMessage(ConfigManager.help);
                     return true;
                 case "update":
-                    if (isAdmin(commandSender)) return false;
+                    if (isNotAdmin(commandSender)) return false;
                     new ForceUpdateCommand(plugin).run();
                     commandSender.sendMessage(ConfigManager.forceUpdated);
                     return true;
@@ -88,8 +87,8 @@ public class LeaderSystemCommand implements CommandExecutor {
                     });
                     return true;
                 } else {
+                    if (isNotAdmin(commandSender)) return false;
                     String target = strings[2];
-
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                         Board board = Utils.getBoard(boardList, target);

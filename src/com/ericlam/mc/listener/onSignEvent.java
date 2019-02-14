@@ -22,6 +22,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -116,6 +117,7 @@ public class onSignEvent implements Listener {
     @EventHandler
     public void onSignClick(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (e.getHand() == EquipmentSlot.OFF_HAND) return;
         if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.WALL_SIGN) return;
         Player player = e.getPlayer();
         Block sign = e.getClickedBlock();

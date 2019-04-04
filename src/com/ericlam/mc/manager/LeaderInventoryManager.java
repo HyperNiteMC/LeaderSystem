@@ -71,14 +71,12 @@ public class LeaderInventoryManager {
 
     public void forceUpdateInv() {
         ConcurrentLinkedDeque<String> itemQueue = new ConcurrentLinkedDeque<>(leaderInventories.keySet());
-        synchronized (this) {
             while (!itemQueue.isEmpty()) {
                 String item = itemQueue.poll();
                 if (item == null) continue;
                 LeaderBoard leaderBoard = Utils.getItem(item);
                 if (leaderBoard != null) getLeaderInventoryFromSQL(leaderBoard);
             }
-        }
     }
 
     public void inventoryUpdateScheduler(Plugin plugin) {

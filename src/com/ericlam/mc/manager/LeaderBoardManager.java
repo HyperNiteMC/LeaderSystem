@@ -85,12 +85,10 @@ public class LeaderBoardManager {
 
     public void forceUpdateSQL() {
         ConcurrentLinkedDeque<LeaderBoard> leaderBoards = new ConcurrentLinkedDeque<>(usingLeaderBoards);
-        synchronized (this) {
-            while (!leaderBoards.isEmpty()) {
+        while (!leaderBoards.isEmpty()) {
                 LeaderBoard leaderBoard = leaderBoards.poll();
                 getRankingFromSQL(leaderBoard);
             }
-        }
     }
 
     public void startUpdateScheduler(Plugin plugin) {
@@ -107,8 +105,7 @@ public class LeaderBoardManager {
     public void forceUpdateSigns(Plugin plugin) {
         FileConfiguration signData = ConfigManager.signData;
         ConcurrentLinkedDeque<String> signDataLinked = new ConcurrentLinkedDeque<>(signData.getKeys(false));
-        synchronized (this) {
-            while (!signDataLinked.isEmpty()) {
+        while (!signDataLinked.isEmpty()) {
                 String uid = signDataLinked.poll();
                 String item = signData.getString(uid + ".item");
                 int rank = signData.getInt(uid + ".rank");
@@ -137,7 +134,6 @@ public class LeaderBoardManager {
                     PlayerHeadGetter.updateHeadBlock(base64, headBlock);
                 });
             }
-        }
     }
 
     public void startSignUpdate(Plugin plugin) {

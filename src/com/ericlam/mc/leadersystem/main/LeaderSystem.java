@@ -1,11 +1,11 @@
-package com.ericlam.mc.main;
+package com.ericlam.mc.leadersystem.main;
 
-import com.ericlam.mc.commandhandler.LeaderSystemCommand;
-import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.listener.onSignEvent;
-import com.ericlam.mc.manager.LeaderBoardManager;
-import com.ericlam.mc.manager.LeaderInventoryManager;
-import com.ericlam.mc.placeholders.PlaceholderHook;
+import com.ericlam.mc.leadersystem.commandhandler.LeaderSystemCommand;
+import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.listener.onSignEvent;
+import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
+import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
+import com.ericlam.mc.leadersystem.placeholders.PlaceholderHook;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeaderSystem extends JavaPlugin {

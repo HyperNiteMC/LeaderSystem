@@ -1,4 +1,4 @@
-package com.ericlam.mc.model;
+package com.ericlam.mc.leadersystem.model;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

@@ -1,4 +1,4 @@
-package com.ericlam.mc.model;
+package com.ericlam.mc.leadersystem.model;
 
 import java.util.List;
 

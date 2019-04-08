@@ -1,12 +1,12 @@
-package com.ericlam.mc.listener;
+package com.ericlam.mc.leadersystem.listener;
 
-import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.main.LeaderSystem;
-import com.ericlam.mc.main.Utils;
-import com.ericlam.mc.manager.LeaderBoardManager;
-import com.ericlam.mc.manager.LeaderInventoryManager;
-import com.ericlam.mc.model.Board;
-import com.ericlam.mc.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.main.LeaderSystem;
+import com.ericlam.mc.leadersystem.main.Utils;
+import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
+import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
+import com.ericlam.mc.leadersystem.model.Board;
+import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.skin.PlayerHeadGetter;
 import com.hypernite.skin.SkinDatabaseManager;
 import org.bukkit.Bukkit;

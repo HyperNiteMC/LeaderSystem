@@ -1,6 +1,6 @@
-package com.ericlam.mc.config;
+package com.ericlam.mc.leadersystem.config;
 
-import com.ericlam.mc.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

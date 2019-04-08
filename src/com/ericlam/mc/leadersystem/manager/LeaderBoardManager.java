@@ -1,9 +1,9 @@
-package com.ericlam.mc.manager;
+package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.main.Utils;
-import com.ericlam.mc.model.Board;
-import com.ericlam.mc.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.main.Utils;
+import com.ericlam.mc.leadersystem.model.Board;
+import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mysql.SQLDataSourceManager;
 import com.hypernite.skin.PlayerHeadGetter;
 import com.hypernite.skin.SkinDatabaseManager;

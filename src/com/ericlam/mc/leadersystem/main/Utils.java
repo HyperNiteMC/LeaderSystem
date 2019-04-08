@@ -1,8 +1,8 @@
-package com.ericlam.mc.main;
+package com.ericlam.mc.leadersystem.main;
 
-import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.model.Board;
-import com.ericlam.mc.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.model.Board;
+import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 

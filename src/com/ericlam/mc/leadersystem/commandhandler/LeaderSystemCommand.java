@@ -1,12 +1,12 @@
-package com.ericlam.mc.commandhandler;
+package com.ericlam.mc.leadersystem.commandhandler;
 
-import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.main.LeaderSystem;
-import com.ericlam.mc.main.Utils;
-import com.ericlam.mc.manager.LeaderBoardManager;
-import com.ericlam.mc.manager.LeaderInventoryManager;
-import com.ericlam.mc.model.Board;
-import com.ericlam.mc.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.main.LeaderSystem;
+import com.ericlam.mc.leadersystem.main.Utils;
+import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
+import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
+import com.ericlam.mc.leadersystem.model.Board;
+import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

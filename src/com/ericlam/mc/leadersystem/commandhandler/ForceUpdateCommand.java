@@ -1,7 +1,7 @@
-package com.ericlam.mc.commandhandler;
+package com.ericlam.mc.leadersystem.commandhandler;
 
-import com.ericlam.mc.manager.LeaderBoardManager;
-import com.ericlam.mc.manager.LeaderInventoryManager;
+import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
+import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;

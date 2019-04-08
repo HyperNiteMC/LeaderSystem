@@ -2,7 +2,6 @@ package com.ericlam.mc.main;
 
 import com.ericlam.mc.commandhandler.LeaderSystemCommand;
 import com.ericlam.mc.config.ConfigManager;
-import com.ericlam.mc.listener.onInventoryEvent;
 import com.ericlam.mc.listener.onSignEvent;
 import com.ericlam.mc.manager.LeaderBoardManager;
 import com.ericlam.mc.manager.LeaderInventoryManager;
@@ -15,7 +14,6 @@ public class LeaderSystem extends JavaPlugin {
         new ConfigManager(this).loadConfig();
         this.getLogger().info("LeaderSystem Enabled.");
         this.getServer().getPluginManager().registerEvents(new onSignEvent(this), this);
-        this.getServer().getPluginManager().registerEvents(new onInventoryEvent(), this);//this can be removed if caxerx onclick method fixed.
         this.getCommand("leadersystem").setExecutor(new LeaderSystemCommand(this));
         LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
         LeaderInventoryManager leaderInventoryManager = LeaderInventoryManager.getInstance();

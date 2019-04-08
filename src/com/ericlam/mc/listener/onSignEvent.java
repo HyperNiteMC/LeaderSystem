@@ -25,7 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
 
-import java.util.List;
+import java.util.TreeSet;
 
 public class onSignEvent implements Listener {
     private final Plugin plugin;
@@ -51,7 +51,7 @@ public class onSignEvent implements Listener {
         }
         LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
         Bukkit.getScheduler().runTaskAsynchronously(plugin,()->{
-            List<Board> boards = leaderBoardManager.getRanking(leaderBoard);
+            TreeSet<Board> boards = leaderBoardManager.getRanking(leaderBoard);
             Board board = Utils.getBoard(boards, rank);
             if (board == null){
                 player.sendMessage(ConfigManager.rankNull);

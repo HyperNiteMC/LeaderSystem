@@ -2,10 +2,11 @@ package com.ericlam.mc.model;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class Board {
+public class Board implements Comparable<Board> {
     private int rank;
     private UUID playerUUID;
     private String playerName;
@@ -42,5 +43,10 @@ public class Board {
 
     public String getDataShow() {
         return dataShow;
+    }
+
+    @Override
+    public int compareTo(@NotNull Board board) {
+        return Integer.compare(this.rank, board.getRank());
     }
 }

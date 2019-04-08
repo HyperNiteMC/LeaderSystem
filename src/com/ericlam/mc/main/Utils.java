@@ -6,7 +6,7 @@ import com.ericlam.mc.model.LeaderBoard;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class Utils {
@@ -18,14 +18,14 @@ public class Utils {
         return null;
     }
 
-    public static Board getBoard(List<Board> boards, int rank) {
+    public static Board getBoard(TreeSet<Board> boards, int rank) {
         for (Board board : boards) {
             if (board.getRank() == rank) return board;
         }
         return null;
     }
 
-    public static Board getBoard(List<Board> boards, UUID uuid) {
+    public static Board getBoard(TreeSet<Board> boards, UUID uuid) {
         for (Board board : boards) {
             if (board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
             if (board.getPlayerUUID().toString().equals(uuid.toString())) return board;
@@ -33,7 +33,7 @@ public class Utils {
         return null;
     }
 
-    public static Board getBoard(List<Board> boards, String name) {
+    public static Board getBoard(TreeSet<Board> boards, String name) {
         for (Board board : boards) {
             if (board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
             if (board.getPlayerName().equals(name)) return board;

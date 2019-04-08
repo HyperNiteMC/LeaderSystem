@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -46,14 +47,14 @@ public class LeaderInventoryManager {
     private Inventory getLeaderInventoryFromSQL(LeaderBoard leaderBoard) {
         String item = leaderBoard.getItem();
         Inventory inv = new InventoryBuilder(ConfigManager.guiSize, leaderBoard.getInvTitle()).build();
-        List<Board> boards = leaderBoardManager.getRanking(leaderBoard);
+        List<Board> boards = new ArrayList<>(leaderBoardManager.getRanking(leaderBoard));
         for (int i = 0; i < ConfigManager.guiSize; i++) {
             Board board = boards.get(i);
             if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
             String b64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID(), board.getPlayerName());
             String invName = replaceData(leaderBoard.getInvName(), board);
             ItemStack stack = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName)
-                    .lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).build(); //onClick method have bug, wait caxerx to fix it
+                    .lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true)).build();
             PlayerHeadGetter.setSkullMeta(b64, stack);
             inv.setItem(i, stack);
         }

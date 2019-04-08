@@ -10,7 +10,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.List;
+import java.util.TreeSet;
 
 public class PlaceholderHook extends PlaceholderExpansion {
 
@@ -35,7 +35,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
         String item = args[1];
         LeaderBoard leaderBoard = Utils.getItem(item);
         if (leaderBoard == null) return NO_THIS_STATISTIC;
-        List<Board> boardList = leaderBoardManager.getRanking(leaderBoard);
+        TreeSet<Board> boardList = leaderBoardManager.getRanking(leaderBoard);
         switch (args[0]) {
             case "rank":
                 Board board = Utils.getBoard(boardList, p.getUniqueId());

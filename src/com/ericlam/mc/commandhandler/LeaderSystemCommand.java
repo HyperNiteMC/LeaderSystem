@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
-import java.util.List;
+import java.util.TreeSet;
 
 public class LeaderSystemCommand implements CommandExecutor {
     private final Plugin plugin;
@@ -77,7 +77,7 @@ public class LeaderSystemCommand implements CommandExecutor {
             case "get":
                 if (strings.length == 2) {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                        TreeSet<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                         Board board = Utils.getBoard(boardList, player.getUniqueId());
                         if (board == null) {
                             player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
@@ -90,7 +90,7 @@ public class LeaderSystemCommand implements CommandExecutor {
                     if (isNotAdmin(commandSender)) return false;
                     String target = strings[2];
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        List<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                        TreeSet<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                         Board board = Utils.getBoard(boardList, target);
                         if (board == null) {
                             player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));

@@ -32,11 +32,11 @@ public class LeaderBoardManager {
         return leaderBoardManager;
     }
 
-    private HashMap<String,List<Board>> caching = new HashMap<>();
+    private HashMap<String, TreeSet<Board>> caching = new HashMap<>();
     private Set<LeaderBoard> usingLeaderBoards = new HashSet<>();
     private BukkitTask updateTask, signUpdateTask;
 
-    public List<Board> getRanking(LeaderBoard leaderBoard){
+    public TreeSet<Board> getRanking(LeaderBoard leaderBoard) {
         String item = leaderBoard.getItem();
         if (caching.containsKey(item)) return caching.get(item);
         else return getRankingFromSQL(leaderBoard);
@@ -46,10 +46,10 @@ public class LeaderBoardManager {
         return usingLeaderBoards;
     }
 
-    private List<Board> getRankingFromSQL(LeaderBoard leaderBoard){
+    private TreeSet<Board> getRankingFromSQL(LeaderBoard leaderBoard) {
         usingLeaderBoards.add(leaderBoard);
         String origDatabase = com.hypernite.config.ConfigManager.getInstance().getDatabase().getString("database");
-        List<Board> boards = new ArrayList<>();
+        TreeSet<Board> boards = new TreeSet<>();
         String database = leaderBoard.getDatabase();
         String table = leaderBoard.getTable();
         String column = leaderBoard.getColumn();
@@ -115,7 +115,7 @@ public class LeaderBoardManager {
                 if (leaderBoard == null || loc == null || headLoc == null) continue;
                 if (loc.getBlock().getType() != Material.WALL_SIGN) continue;
                 Block sign = loc.getBlock();
-                List<Board> boards = getRanking(leaderBoard);
+            TreeSet<Board> boards = getRanking(leaderBoard);
                 Board board = Utils.getBoard(boards, rank);
                 if (board == null || board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
                 String base64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID(), board.getPlayerName());

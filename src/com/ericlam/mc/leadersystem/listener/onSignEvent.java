@@ -94,8 +94,13 @@ public class onSignEvent implements Listener {
                 String uid = Utils.uidGenerator();
                 signData.set(uid + ".item", item);
                 signData.set(uid + ".rank", rank);
-                signData.set(uid + ".location", signLoc);
-                signData.set(uid + ".head-location", headBlock.getLocation());
+                signData.set(uid + ".world", signLoc.getWorld().getName());
+                signData.set(uid + ".location.x", signLoc.getX());
+                signData.set(uid + ".location.y", signLoc.getY());
+                signData.set(uid + ".location.z", signLoc.getZ());
+                signData.set(uid + ".head-location.x", headBlock.getLocation().getX());
+                signData.set(uid + ".head-location.y", headBlock.getLocation().getY());
+                signData.set(uid + ".head-location.z", headBlock.getLocation().getZ());
                 ConfigManager.saveSignData();
             });
         });

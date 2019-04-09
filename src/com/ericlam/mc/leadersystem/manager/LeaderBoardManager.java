@@ -109,8 +109,8 @@ public class LeaderBoardManager {
                 String uid = signDataLinked.poll();
                 String item = signData.getString(uid + ".item");
                 int rank = signData.getInt(uid + ".rank");
-                Location loc = (Location) signData.get(uid + ".location");
-                Location headLoc = (Location) signData.get(uid + ".head-location");
+            Location loc = Utils.getLocationFromConfig(signData, uid);
+            Location headLoc = Utils.getLocationFromConfig(signData, uid, "head-location");
                 LeaderBoard leaderBoard = Utils.getItem(item);
                 if (leaderBoard == null || loc == null || headLoc == null) continue;
                 if (loc.getBlock().getType() != Material.WALL_SIGN) continue;

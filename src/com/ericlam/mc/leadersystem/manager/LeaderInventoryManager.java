@@ -1,13 +1,11 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.caxerx.builders.InventoryBuilder;
-import com.caxerx.builders.ItemStackBuilder;
 import com.ericlam.mc.leadersystem.config.ConfigManager;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
-import com.hypernite.skin.PlayerHeadGetter;
-import com.hypernite.skin.SkinDatabaseManager;
+import com.hypernite.mc.hnmc.core.builders.InventoryBuilder;
+import com.hypernite.mc.hnmc.core.builders.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -51,11 +49,9 @@ public class LeaderInventoryManager {
         for (int i = 0; i < ConfigManager.guiSize; i++) {
             Board board = boards.get(i);
             if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
-            String b64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID(), board.getPlayerName());
             String invName = replaceData(leaderBoard.getInvName(), board);
-            ItemStack stack = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName)
+            ItemStack stack = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName).head(board.getPlayerUUID(), board.getPlayerName())
                     .lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true)).build();
-            PlayerHeadGetter.setSkullMeta(b64, stack);
             inv.setItem(i, stack);
         }
         leaderInventories.put(item, inv);
@@ -75,8 +71,7 @@ public class LeaderInventoryManager {
             while (!itemQueue.isEmpty()) {
                 String item = itemQueue.poll();
                 if (item == null) continue;
-                LeaderBoard leaderBoard = Utils.getItem(item);
-                if (leaderBoard != null) getLeaderInventoryFromSQL(leaderBoard);
+                Utils.getItem(item).ifPresent(this::getLeaderInventoryFromSQL);
             }
     }
 

@@ -1,6 +1,7 @@
 package com.ericlam.mc.leadersystem.config;
 
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,7 +38,7 @@ public class ConfigManager {
         leader = YamlConfiguration.loadConfiguration(leaderFile);
         signData = YamlConfiguration.loadConfiguration(signDataFile);
         config = YamlConfiguration.loadConfiguration(configFile);
-        prefix = com.hypernite.config.ConfigManager.getInstance().getPrefix();
+        prefix = HyperNiteMC.getAPI().getCoreConfig().getPrefix();
     }
 
     private static boolean saveSign() {

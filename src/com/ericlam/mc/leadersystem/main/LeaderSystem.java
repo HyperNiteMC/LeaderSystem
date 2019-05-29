@@ -14,7 +14,7 @@ public class LeaderSystem extends JavaPlugin {
         new ConfigManager(this).loadConfig();
         this.getLogger().info("LeaderSystem Enabled.");
         this.getServer().getPluginManager().registerEvents(new onSignEvent(this), this);
-        this.getCommand("leadersystem").setExecutor(new LeaderSystemCommand(this));
+        new LeaderSystemCommand(this).register();
         LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
         LeaderInventoryManager leaderInventoryManager = LeaderInventoryManager.getInstance();
         leaderBoardManager.startUpdateScheduler(this);

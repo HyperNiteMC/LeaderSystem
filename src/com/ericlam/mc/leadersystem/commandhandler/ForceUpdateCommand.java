@@ -2,7 +2,6 @@ package com.ericlam.mc.leadersystem.commandhandler;
 
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
 import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -19,10 +18,8 @@ public class ForceUpdateCommand extends BukkitRunnable {
 
     @Override
     public void run() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            leaderInventoryManager.forceUpdateInv();
-            leaderBoardManager.forceUpdateSigns(plugin);
-            leaderBoardManager.forceUpdateSQL();
-        });
+        leaderInventoryManager.forceUpdateInv();
+        leaderBoardManager.forceUpdateSigns(plugin);
+        leaderBoardManager.forceUpdateSQL();
     }
 }

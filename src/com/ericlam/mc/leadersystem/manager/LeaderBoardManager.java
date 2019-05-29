@@ -4,9 +4,7 @@ import com.ericlam.mc.leadersystem.config.ConfigManager;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
-import com.hypernite.mysql.SQLDataSourceManager;
-import com.hypernite.skin.PlayerHeadGetter;
-import com.hypernite.skin.SkinDatabaseManager;
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,7 +46,7 @@ public class LeaderBoardManager {
 
     private TreeSet<Board> getRankingFromSQL(LeaderBoard leaderBoard) {
         usingLeaderBoards.add(leaderBoard);
-        String origDatabase = com.hypernite.config.ConfigManager.getInstance().getDatabase().getString("database");
+        String origDatabase = HyperNiteMC.getAPI().getCoreConfig().getDataBase().getString("database");
         TreeSet<Board> boards = new TreeSet<>();
         String database = leaderBoard.getDatabase();
         String table = leaderBoard.getTable();
@@ -59,10 +57,10 @@ public class LeaderBoardManager {
         int limit = ConfigManager.selectLimit;
         String selectStmt;
         selectStmt = "SELECT "+(name.isEmpty() ? "" : "`"+name+"`,")+"`"+uuid+"`,`"+(show.isEmpty() ? column : show)+"` FROM "+table+" ORDER BY "+column+" DESC LIMIT "+limit;
-        try(Connection connection = SQLDataSourceManager.getInstance().getFuckingConnection();
-            PreparedStatement use = connection.prepareStatement("USE "+database);
-            PreparedStatement select = connection.prepareStatement(selectStmt);
-            PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {
+        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection();
+             PreparedStatement use = connection.prepareStatement("USE "+database);
+             PreparedStatement select = connection.prepareStatement(selectStmt);
+             PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {
             use.execute();
             ResultSet resultSet = select.executeQuery();
             back.execute();
@@ -106,32 +104,33 @@ public class LeaderBoardManager {
         FileConfiguration signData = ConfigManager.signData;
         ConcurrentLinkedDeque<String> signDataLinked = new ConcurrentLinkedDeque<>(signData.getKeys(false));
         while (!signDataLinked.isEmpty()) {
-                String uid = signDataLinked.poll();
-                String item = signData.getString(uid + ".item");
-                int rank = signData.getInt(uid + ".rank");
+            String uid = signDataLinked.poll();
+            String item = signData.getString(uid + ".item");
+            int rank = signData.getInt(uid + ".rank");
             Location loc = Utils.getLocationFromConfig(signData, uid);
             Location headLoc = Utils.getLocationFromConfig(signData, uid, "head-location");
-                LeaderBoard leaderBoard = Utils.getItem(item);
-                if (leaderBoard == null || loc == null || headLoc == null) continue;
-                if (loc.getBlock().getType() != Material.WALL_SIGN) continue;
-                Block sign = loc.getBlock();
-            TreeSet<Board> boards = getRanking(leaderBoard);
-                Board board = Utils.getBoard(boards, rank);
-                if (board == null || board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
-                String base64 = SkinDatabaseManager.getInstance().getPlayerSkin(board.getPlayerUUID(), board.getPlayerName());
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    Sign signState = (Sign) sign.getState();
-                    for (int i = 0; i < 4; i++) {
-                        String line = leaderBoard.getSigns().get(i)
-                                .replaceAll("<rank>", board.getRank() + "")
-                                .replaceAll("<player>", board.getPlayerName())
-                                .replaceAll("<data>", board.getDataShow());
-                        signState.setLine(i, line);
-                    }
-                    signState.update(true);
-                    sign.getState().update(true);
-                    Block headBlock = headLoc.getBlock();
-                    PlayerHeadGetter.updateHeadBlock(base64, headBlock);
+            if (loc == null || headLoc == null) continue;
+            if (loc.getBlock().getType() != Material.WALL_SIGN) continue;
+            Block sign = loc.getBlock();
+            Utils.getItem(item).ifPresent(leaderBoard -> {
+                TreeSet<Board> boards = getRanking(leaderBoard);
+                Utils.getBoard(boards, rank).ifPresent(board -> {
+                    if (board.getPlayerUUID() == null || board.getPlayerName() == null) return;
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        Sign signState = (Sign) sign.getState();
+                        for (int i = 0; i < 4; i++) {
+                            String line = leaderBoard.getSigns().get(i)
+                                    .replaceAll("<rank>", board.getRank() + "")
+                                    .replaceAll("<player>", board.getPlayerName())
+                                    .replaceAll("<data>", board.getDataShow());
+                            signState.setLine(i, line);
+                        }
+                        signState.update(true);
+                        sign.getState().update(true);
+                        Block headBlock = headLoc.getBlock();
+                        HyperNiteMC.getAPI().getPlayerSkinManager().updateHeadBlock(board.getPlayerUUID(), board.getPlayerName(), headBlock);
+                    });
+                });
                 });
             }
     }

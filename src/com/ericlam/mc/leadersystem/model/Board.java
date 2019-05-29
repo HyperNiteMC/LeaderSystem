@@ -2,8 +2,8 @@ package com.ericlam.mc.leadersystem.model;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class Board implements Comparable<Board> {
@@ -46,7 +46,7 @@ public class Board implements Comparable<Board> {
     }
 
     @Override
-    public int compareTo(@NotNull Board board) {
+    public int compareTo(@Nonnull Board board) {
         return Integer.compare(this.rank, board.getRank());
     }
 }

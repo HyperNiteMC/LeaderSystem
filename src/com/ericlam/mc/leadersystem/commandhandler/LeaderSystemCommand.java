@@ -6,111 +6,101 @@ import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
 import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
 import com.ericlam.mc.leadersystem.model.Board;
-import com.ericlam.mc.leadersystem.model.LeaderBoard;
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
+import com.hypernite.mc.hnmc.core.misc.commands.*;
+import com.hypernite.mc.hnmc.core.misc.permission.Perm;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
 
 import java.util.TreeSet;
 
-public class LeaderSystemCommand implements CommandExecutor {
-    private final Plugin plugin;
-    private String noPerm;
-
-    public LeaderSystemCommand(LeaderSystem plugin) {
-        this.plugin = plugin;
-        com.hypernite.config.ConfigManager cf = com.hypernite.config.ConfigManager.getInstance();
-        noPerm = cf.getPrefix() + cf.getNoPerm();
-    }
-
-    private boolean isNotAdmin(CommandSender commandSender) {
-        if (!commandSender.hasPermission("hypernite.admin")) {
-            commandSender.sendMessage(noPerm);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender commandSender, org.bukkit.command.Command command, String s, String[] strings) {
-        if (strings.length < 1) {
-            commandSender.sendMessage("§eLeaderSystem §a" + plugin.getDescription().getVersion() + "§e made by §b" + plugin.getDescription().getAuthors());
-            return true;
-        }
+public class LeaderSystemCommand {
+    private LeaderSystem leaderSystem;
+    private DefaultCommand root;
 
 
-        if (strings.length == 1) {
-            switch (strings[0]) {
-                case "help":
+    public LeaderSystemCommand(LeaderSystem leaderSystem) {
+        this.leaderSystem = leaderSystem;
+        CommandNode help = new CommandNodeBuilder("help").description("指令幫助").alias("?").permission(Perm.ADMIN)
+                .execute((commandSender, list) -> {
                     commandSender.sendMessage(ConfigManager.help);
                     return true;
-                case "update":
-                    if (isNotAdmin(commandSender)) return false;
-                    new ForceUpdateCommand(plugin).run();
+                }).build();
+
+        CommandNode update = new CommandNodeBuilder("update").description("強制更新排行戰績").permission(Perm.ADMIN)
+                .execute((commandSender, list) -> {
+                    new ForceUpdateCommand(leaderSystem).runTaskAsynchronously(leaderSystem);
                     commandSender.sendMessage(ConfigManager.forceUpdated);
                     return true;
-                default:
-                    commandSender.sendMessage(ConfigManager.help);
+                }).build();
+
+        CommandNode get = new CommandNodeBuilder("get").description("獲得自己/別人戰績的排行與數值").permission(Perm.ADMIN)
+                .placeholder("<stats> [player]")
+                .execute((commandSender, list) -> {
+                    if (!(commandSender instanceof Player)) {
+                        commandSender.sendMessage("not player");
+                        return false;
+                    }
+                    Player player = (Player) commandSender;
+                    if (list.size() < 2) {
+                        Utils.getItem(list.get(0)).ifPresentOrElse(leaderBoard -> {
+                            this.runAsync(() -> {
+                                TreeSet<Board> boardsList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                                Utils.getBoard(boardsList, player.getUniqueId()).ifPresentOrElse(board ->
+                                                player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem())
+                                                        .replaceAll("<rank>", board.getRank() + "")
+                                                        .replaceAll("<data>", board.getDataShow())),
+                                        () -> player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + "")));
+                            });
+                        }, () -> player.sendMessage(ConfigManager.noStatistic));
+                    } else {
+                        String target = list.get(1);
+                        Utils.getItem(list.get(0)).ifPresentOrElse(leaderBoard -> {
+                            this.runAsync(() -> {
+                                TreeSet<Board> boardsList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
+                                Utils.getBoard(boardsList, target).ifPresentOrElse(board ->
+                                                player.sendMessage(ConfigManager.getStatisticPlayer.replaceAll("<player>", target)
+                                                        .replaceAll("<item>", leaderBoard.getItem())
+                                                        .replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow())),
+                                        () -> player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + "")));
+                            });
+                        }, () -> player.sendMessage(ConfigManager.noStatistic));
+                    }
                     return true;
-            }
-        }
+                }).build();
 
-        if (!(commandSender instanceof Player)) {
-            commandSender.sendMessage("Not player!");
-            return false;
-        }
-
-        Player player = (Player) commandSender;
-
-        String item = strings[1];
-        LeaderBoard leaderBoard = Utils.getItem(item);
-
-        if (leaderBoard == null) {
-            player.sendMessage(ConfigManager.noStatistic);
-            return false;
-        }
-
-        switch (strings[0]) {
-            case "get":
-                if (strings.length == 2) {
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        TreeSet<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
-                        Board board = Utils.getBoard(boardList, player.getUniqueId());
-                        if (board == null) {
-                            player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
-                            return;
-                        }
-                        player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
-                    });
+        CommandNode inv = new CommandNodeBuilder("inv").description("打開該戰績的排行界面").alias("openinv", "gui").placeholder("<stats>")
+                .execute((commandSender, list) -> {
+                    if (!(commandSender instanceof Player)) {
+                        commandSender.sendMessage("not player");
+                        return false;
+                    }
+                    Player player = (Player) commandSender;
+                    Utils.getItem(list.get(0)).ifPresentOrElse(leaderBoard -> {
+                        this.runAsync(() -> {
+                            Inventory inventory = LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard);
+                            Bukkit.getScheduler().runTask(leaderSystem, () -> player.openInventory(inventory));
+                        });
+                    }, () -> player.sendMessage(ConfigManager.noStatistic));
                     return true;
-                } else {
-                    if (isNotAdmin(commandSender)) return false;
-                    String target = strings[2];
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        TreeSet<Board> boardList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
-                        Board board = Utils.getBoard(boardList, target);
-                        if (board == null) {
-                            player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + ""));
-                            return;
-                        }
-                        player.sendMessage(ConfigManager.getStatisticPlayer.replaceAll("<player>", target).replaceAll("<item>", leaderBoard.getItem()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow()));
-                    });
-                }
-                return true;
-            case "inv":
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                    Inventory inv = LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard);
-                    Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inv));
-                });
-                return true;
-            default:
-                player.sendMessage(ConfigManager.help);
-                break;
-        }
+                }).build();
 
-        return false;
+        CommandNode test = new AdvCommandNodeBuilder<Player>("test").description("Test command").execute((sender, list) -> {
+            sender.setAllowFlight(!sender.getAllowFlight());
+            sender.sendMessage("your fly is now: " + sender.getAllowFlight());
+            return true;
+        }).build();
+
+        this.root = new DefaultCommandBuilder("leadersystem").description("LeaderSystem 主指令").children(help, update, get, inv, test).build();
+    }
+
+
+    private void runAsync(Runnable runnable) {
+        Bukkit.getScheduler().runTaskAsynchronously(leaderSystem, runnable);
+    }
+
+    public void register() {
+        HyperNiteMC.getAPI().getCommandRegister().registerCommand(leaderSystem, this.root);
     }
 }

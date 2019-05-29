@@ -10,6 +10,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Optional;
 import java.util.TreeSet;
 
 public class PlaceholderHook extends PlaceholderExpansion {
@@ -33,19 +34,21 @@ public class PlaceholderHook extends PlaceholderExpansion {
         String[] args = params.split("_");
         if (args.length != 2) return NOT_ENOUGH_ARGS;
         String item = args[1];
-        LeaderBoard leaderBoard = Utils.getItem(item);
-        if (leaderBoard == null) return NO_THIS_STATISTIC;
-        TreeSet<Board> boardList = leaderBoardManager.getRanking(leaderBoard);
+        Optional<LeaderBoard> leaderBoard = Utils.getItem(item);
+        if (leaderBoard.isEmpty()) {
+            return NO_THIS_STATISTIC;
+        }
+        TreeSet<Board> boardList = leaderBoardManager.getRanking(leaderBoard.get());
         switch (args[0]) {
             case "rank":
-                Board board = Utils.getBoard(boardList, p.getUniqueId());
-                if (board == null) return NOT_IN_LIMIT;
-                return board.getRank() + "";
+                Optional<Board> board = Utils.getBoard(boardList, p.getUniqueId());
+                if (board.isEmpty()) return NOT_IN_LIMIT;
+                return board.get().getRank() + "";
             case "first":
-                Board boardFirst = Utils.getBoard(boardList, 1);
-                if (boardFirst == null || boardFirst.getPlayerName() == null || boardFirst.getPlayerUUID() == null)
+                Optional<Board> boardFirst = Utils.getBoard(boardList, 1);
+                if (boardFirst.isEmpty() || boardFirst.get().getPlayerName() == null || boardFirst.get().getPlayerUUID() == null)
                     return null;
-                return boardFirst.getPlayerName();
+                return boardFirst.get().getPlayerName();
             default:
                 break;
         }

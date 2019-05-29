@@ -8,39 +8,36 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
 
 public class Utils {
 
-    public static LeaderBoard getItem(String item){
-        for (LeaderBoard leaderBoard : ConfigManager.leaderBoards) {
-            if (leaderBoard.getItem().equalsIgnoreCase(item)) return leaderBoard;
-        }
-        return null;
+    public static Optional<LeaderBoard> getItem(String item) {
+        return ConfigManager.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
     }
 
-    public static Board getBoard(TreeSet<Board> boards, int rank) {
-        for (Board board : boards) {
-            if (board.getRank() == rank) return board;
-        }
-        return null;
+    public static Optional<Board> getBoard(TreeSet<Board> boards, int rank) {
+        return boards.stream().filter(board -> board.getRank() == rank).findAny();
     }
 
-    public static Board getBoard(TreeSet<Board> boards, UUID uuid) {
-        for (Board board : boards) {
-            if (board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
-            if (board.getPlayerUUID().toString().equals(uuid.toString())) return board;
-        }
-        return null;
+    public static Optional<Board> getBoard(TreeSet<Board> boards, UUID uuid) {
+        return boards.stream().filter(board -> {
+            if (board.getPlayerUUID() != null && board.getPlayerName() != null) {
+                return board.getPlayerUUID().toString().equals(uuid.toString());
+            }
+            return false;
+        }).findAny();
     }
 
-    public static Board getBoard(TreeSet<Board> boards, String name) {
-        for (Board board : boards) {
-            if (board.getPlayerUUID() == null || board.getPlayerName() == null) continue;
-            if (board.getPlayerName().equals(name)) return board;
-        }
-        return null;
+    public static Optional<Board> getBoard(TreeSet<Board> boards, String name) {
+        return boards.stream().filter(board -> {
+            if (board.getPlayerUUID() != null && board.getPlayerName() != null) {
+                return board.getPlayerName().equals(name);
+            }
+            return false;
+        }).findAny();
     }
 
     public static String uidGenerator() {

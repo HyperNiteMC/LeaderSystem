@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -48,6 +49,7 @@ public class Utils {
         return uid;
     }
 
+    @Nullable
     public static String getUidFromLoc(Location location) {
         FileConfiguration signData = ConfigManager.signData;
         for (String key : signData.getKeys(false)) {

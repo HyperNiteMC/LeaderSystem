@@ -6,6 +6,7 @@ import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.builders.InventoryBuilder;
 import com.hypernite.mc.hnmc.core.builders.ItemStackBuilder;
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,9 +14,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
@@ -42,11 +46,11 @@ public class LeaderInventoryManager {
         return str.replaceAll("<player>", board.getPlayerName()).replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow());
     }
 
-    private Inventory getLeaderInventoryFromSQL(LeaderBoard leaderBoard) {
+    private Inventory getLeaderInventoryFromSQL(Connection connection, LeaderBoard leaderBoard) throws SQLException {
         String item = leaderBoard.getItem();
-        Inventory inv = new InventoryBuilder(ConfigManager.guiSize, leaderBoard.getInvTitle()).build();
-        List<Board> boards = new ArrayList<>(leaderBoardManager.getRanking(leaderBoard));
-        for (int i = 0; i < ConfigManager.guiSize; i++) {
+        Inventory inv = new InventoryBuilder(ConfigManager.guiRow, leaderBoard.getInvTitle()).build();
+        List<Board> boards = new ArrayList<>(leaderBoardManager.getRanking(connection, leaderBoard));
+        for (int i = 0; i < (ConfigManager.guiRow * 9); i++) {
             Board board = boards.get(i);
             if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
             String invName = replaceData(leaderBoard.getInvName(), board);
@@ -56,6 +60,15 @@ public class LeaderInventoryManager {
         }
         leaderInventories.put(item, inv);
         return inv;
+    }
+
+    private Inventory getLeaderInventoryFromSQL(LeaderBoard leaderBoard) {
+        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection()) {
+            return this.getLeaderInventoryFromSQL(connection, leaderBoard);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new InventoryBuilder(ConfigManager.guiRow, leaderBoard.getInvTitle()).build();
     }
 
 
@@ -68,11 +81,16 @@ public class LeaderInventoryManager {
 
     public void forceUpdateInv() {
         ConcurrentLinkedDeque<String> itemQueue = new ConcurrentLinkedDeque<>(leaderInventories.keySet());
+        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection()) {
             while (!itemQueue.isEmpty()) {
                 String item = itemQueue.poll();
                 if (item == null) continue;
-                Utils.getItem(item).ifPresent(this::getLeaderInventoryFromSQL);
+                Optional<LeaderBoard> leaderBoard = Utils.getItem(item);
+                if (leaderBoard.isPresent()) this.getLeaderInventoryFromSQL(connection, leaderBoard.get());
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void inventoryUpdateScheduler(Plugin plugin) {
@@ -83,7 +101,7 @@ public class LeaderInventoryManager {
                 forceUpdateInv();
                 plugin.getLogger().info("Leader Inventories Updated.");
             }
-        }.runTaskTimerAsynchronously(plugin, 300 * 20L, 3600 * 20L);
+        }.runTaskTimerAsynchronously(plugin, 3600 * 20L, 3600 * 20L);
     }
 
 

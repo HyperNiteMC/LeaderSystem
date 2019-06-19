@@ -11,16 +11,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConfigManager {
     public static FileConfiguration signData;
     public static String rankNull, notValue, playerNull, createSignSuccess, signRemoved, forceUpdated, getStatistic, getStatisticPlayer, noStatistic, notInLimit;
-    public static String[] help;
     public static Set<LeaderBoard> leaderBoards = new HashSet<>();
     private String prefix;
-    public static int guiSize, selectLimit;
+    public static int guiRow, selectLimit;
     private static File signDataFile;
     private static Plugin plugin;
     private FileConfiguration leader, msg, config;
@@ -98,15 +98,14 @@ public class ConfigManager {
         getStatisticPlayer = translate("get-statistic-player");
         noStatistic = translate("no-statistic");
         notInLimit = translate("not-in-limit");
-        help = translate(msg.getStringList("help"));
 
-        guiSize = config.getInt("gui-size");
+        guiRow = config.getInt("gui-row");
         selectLimit = config.getInt("select-limit");
 
     }
 
     private String translate(String path, FileConfiguration config) {
-        return ChatColor.translateAlternateColorCodes('&', config.getString(path));
+        return ChatColor.translateAlternateColorCodes('&', Optional.ofNullable(config.getString(path)).orElse(""));
     }
 
 

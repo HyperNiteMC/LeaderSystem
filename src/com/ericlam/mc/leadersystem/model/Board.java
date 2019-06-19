@@ -17,6 +17,7 @@ public class Board implements Comparable<Board> {
         this.playerUUID = playerUUID;
         if (playerName.isEmpty()){
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerUUID);
+            // in 1.14.2 , offlinePlayer is always not null
             if (offlinePlayer==null) {
                 this.playerUUID = null;
                 this.playerName = null;

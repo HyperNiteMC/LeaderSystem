@@ -7,9 +7,9 @@ import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,11 +40,26 @@ public class LeaderBoardManager {
         else return getRankingFromSQL(leaderBoard);
     }
 
+    TreeSet<Board> getRanking(Connection connection, LeaderBoard leaderBoard) throws SQLException {
+        String item = leaderBoard.getItem();
+        if (caching.containsKey(item)) return caching.get(item);
+        else return getRankingFromSQL(connection, leaderBoard);
+    }
+
     public Set<LeaderBoard> getUsingLeaderBoards() {
         return usingLeaderBoards;
     }
 
     private TreeSet<Board> getRankingFromSQL(LeaderBoard leaderBoard) {
+        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection()) {
+            return getRankingFromSQL(connection, leaderBoard);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new TreeSet<>();
+    }
+
+    private TreeSet<Board> getRankingFromSQL(Connection connection, LeaderBoard leaderBoard) throws SQLException {
         usingLeaderBoards.add(leaderBoard);
         String origDatabase = HyperNiteMC.getAPI().getCoreConfig().getDataBase().getString("database");
         TreeSet<Board> boards = new TreeSet<>();
@@ -57,10 +72,9 @@ public class LeaderBoardManager {
         int limit = ConfigManager.selectLimit;
         String selectStmt;
         selectStmt = "SELECT "+(name.isEmpty() ? "" : "`"+name+"`,")+"`"+uuid+"`,`"+(show.isEmpty() ? column : show)+"` FROM "+table+" ORDER BY "+column+" DESC LIMIT "+limit;
-        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection();
-             PreparedStatement use = connection.prepareStatement("USE "+database);
-             PreparedStatement select = connection.prepareStatement(selectStmt);
-             PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {
+        PreparedStatement use = connection.prepareStatement("USE " + database);
+        PreparedStatement select = connection.prepareStatement(selectStmt);
+        PreparedStatement back = connection.prepareStatement("USE " + origDatabase);
             use.execute();
             ResultSet resultSet = select.executeQuery();
             back.execute();
@@ -75,18 +89,18 @@ public class LeaderBoardManager {
             }
             caching.put(leaderBoard.getItem(),boards);
             return boards;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return boards;
-        }
     }
 
     public void forceUpdateSQL() {
         ConcurrentLinkedDeque<LeaderBoard> leaderBoards = new ConcurrentLinkedDeque<>(usingLeaderBoards);
-        while (!leaderBoards.isEmpty()) {
+        try (Connection connection = HyperNiteMC.getAPI().getSQLDataSource().getConnection()) {
+            while (!leaderBoards.isEmpty()) {
                 LeaderBoard leaderBoard = leaderBoards.poll();
-                getRankingFromSQL(leaderBoard);
+                getRankingFromSQL(connection, leaderBoard);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startUpdateScheduler(Plugin plugin) {
@@ -97,7 +111,7 @@ public class LeaderBoardManager {
                 forceUpdateSQL();
                 plugin.getLogger().info("Leader Board updated.");
             }
-        }.runTaskTimerAsynchronously(plugin, 300 * 20L, 3600 * 20L);
+        }.runTaskTimerAsynchronously(plugin, 3600 * 20L, 3600 * 20L);
     }
 
     public void forceUpdateSigns(Plugin plugin) {
@@ -110,7 +124,7 @@ public class LeaderBoardManager {
             Location loc = Utils.getLocationFromConfig(signData, uid);
             Location headLoc = Utils.getLocationFromConfig(signData, uid, "head-location");
             if (loc == null || headLoc == null) continue;
-            if (loc.getBlock().getType() != Material.WALL_SIGN) continue;
+            if (loc.getBlock().getBlockData() instanceof WallSign) continue;
             Block sign = loc.getBlock();
             Utils.getItem(item).ifPresent(leaderBoard -> {
                 TreeSet<Board> boards = getRanking(leaderBoard);
@@ -143,6 +157,6 @@ public class LeaderBoardManager {
                 forceUpdateSigns(plugin);
                 plugin.getLogger().info("Leader Signs Updated.");
             }
-        }.runTaskTimerAsynchronously(plugin, 400 * 20L, 3600 * 20L);
+        }.runTaskTimerAsynchronously(plugin, 3600 * 20L, 3600 * 20L);
     }
 }

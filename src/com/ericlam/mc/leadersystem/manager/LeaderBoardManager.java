@@ -72,9 +72,9 @@ public class LeaderBoardManager {
         int limit = LeaderConfig.selectLimit;
         String selectStmt;
         selectStmt = "SELECT "+(name.isEmpty() ? "" : "`"+name+"`,")+"`"+uuid+"`,`"+(show.isEmpty() ? column : show)+"` FROM "+table+" ORDER BY "+column+" DESC LIMIT "+limit;
-        PreparedStatement use = connection.prepareStatement("USE " + database);
-        PreparedStatement select = connection.prepareStatement(selectStmt);
-        PreparedStatement back = connection.prepareStatement("USE " + origDatabase);
+        try (PreparedStatement use = connection.prepareStatement("USE " + database);
+             PreparedStatement select = connection.prepareStatement(selectStmt);
+             PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {
             use.execute();
             ResultSet resultSet = select.executeQuery();
             back.execute();
@@ -89,6 +89,7 @@ public class LeaderBoardManager {
             }
             caching.put(leaderBoard.getItem(),boards);
             return boards;
+        }
     }
 
     public void forceUpdateSQL() {

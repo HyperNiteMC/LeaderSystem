@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.commandhandler;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
@@ -25,7 +25,7 @@ public class LeaderSystemCommand {
         CommandNode update = new CommandNodeBuilder("update").description("強制更新排行戰績").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
                     new ForceUpdateCommand(leaderSystem).runTaskAsynchronously(leaderSystem);
-                    commandSender.sendMessage(ConfigManager.forceUpdated);
+                    commandSender.sendMessage(LeaderConfig.forceUpdated);
                     return true;
                 }).build();
 
@@ -42,24 +42,24 @@ public class LeaderSystemCommand {
                             this.runAsync(() -> {
                                 TreeSet<Board> boardsList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                                 Utils.getBoard(boardsList, player.getUniqueId()).ifPresentOrElse(board ->
-                                                player.sendMessage(ConfigManager.getStatistic.replaceAll("<item>", leaderBoard.getItem())
+                                                player.sendMessage(LeaderConfig.getStatistic.replaceAll("<item>", leaderBoard.getItem())
                                                         .replaceAll("<rank>", board.getRank() + "")
                                                         .replaceAll("<data>", board.getDataShow())),
-                                        () -> player.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + "")));
+                                        () -> player.sendMessage(LeaderConfig.notInLimit.replace("<limit>", LeaderConfig.selectLimit + "")));
                             });
-                        }, () -> player.sendMessage(ConfigManager.noStatistic));
+                        }, () -> player.sendMessage(LeaderConfig.noStatistic));
                     } else {
                         String target = list.get(1);
                         Utils.getItem(list.get(0)).ifPresentOrElse(leaderBoard -> {
                             this.runAsync(() -> {
                                 TreeSet<Board> boardsList = LeaderBoardManager.getInstance().getRanking(leaderBoard);
                                 Utils.getBoard(boardsList, target).ifPresentOrElse(board ->
-                                                commandSender.sendMessage(ConfigManager.getStatisticPlayer.replaceAll("<player>", target)
+                                                commandSender.sendMessage(LeaderConfig.getStatisticPlayer.replaceAll("<player>", target)
                                                         .replaceAll("<item>", leaderBoard.getItem())
                                                         .replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow())),
-                                        () -> commandSender.sendMessage(ConfigManager.notInLimit.replace("<limit>", ConfigManager.selectLimit + "")));
+                                        () -> commandSender.sendMessage(LeaderConfig.notInLimit.replace("<limit>", LeaderConfig.selectLimit + "")));
                             });
-                        }, () -> commandSender.sendMessage(ConfigManager.noStatistic));
+                        }, () -> commandSender.sendMessage(LeaderConfig.noStatistic));
                     }
                     return true;
                 }).build();
@@ -71,7 +71,7 @@ public class LeaderSystemCommand {
                             Inventory inventory = LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard);
                             Bukkit.getScheduler().runTask(leaderSystem, () -> player.openInventory(inventory));
                         });
-                    }, () -> player.sendMessage(ConfigManager.noStatistic));
+                    }, () -> player.sendMessage(LeaderConfig.noStatistic));
                     return true;
                 }).build();
 

@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.listener;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class onSignEvent implements Listener {
             try {
                 rank = Integer.parseInt(rankStr);
             } catch (NumberFormatException ex) {
-                player.sendMessage(ConfigManager.notValue);
+                player.sendMessage(LeaderConfig.notValue);
                 return;
             }
             LeaderBoardManager leaderBoardManager = LeaderBoardManager.getInstance();
@@ -54,10 +55,10 @@ public class onSignEvent implements Listener {
                 TreeSet<Board> boards = leaderBoardManager.getRanking(leaderBoard);
                 Utils.getBoard(boards, rank).ifPresentOrElse(board -> {
                     if (board.getPlayerName() == null || board.getPlayerUUID() == null) {
-                        player.sendMessage(ConfigManager.playerNull);
+                        player.sendMessage(LeaderConfig.playerNull);
                         return;
                     }
-                    player.sendMessage(ConfigManager.createSignSuccess);
+                    player.sendMessage(LeaderConfig.createSignSuccess);
                     final double y = sign.getY();
                     final double x = sign.getX();
                     final double z = sign.getZ();
@@ -71,7 +72,7 @@ public class onSignEvent implements Listener {
                         headBlock = new Location(player.getWorld(), xR, yR + 1, zR).getBlock();
                     }
                     Location signLoc = sign.getLocation();
-                    FileConfiguration signData = ConfigManager.signData;
+                    FileConfiguration signData = LeaderConfig.signData;
                     String uid = Utils.uidGenerator();
                     signData.set(uid + ".item", item);
                     signData.set(uid + ".rank", rank);
@@ -82,7 +83,7 @@ public class onSignEvent implements Listener {
                     signData.set(uid + ".head-location.x", headBlock.getLocation().getX());
                     signData.set(uid + ".head-location.y", headBlock.getLocation().getY());
                     signData.set(uid + ".head-location.z", headBlock.getLocation().getZ());
-                    ConfigManager.saveSignData();
+                    LeaderConfig.saveSignData();
                     Block head = headBlock;
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Sign signState = (Sign) sign.getState();
@@ -98,7 +99,7 @@ public class onSignEvent implements Listener {
                         sign.getState().update(true);
                         HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), head, walled, player.getFacing().getOppositeFace());
                     });
-                }, () -> player.sendMessage(ConfigManager.rankNull));
+                }, () -> player.sendMessage(LeaderConfig.rankNull));
             });
         });
     }
@@ -111,10 +112,10 @@ public class onSignEvent implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String uid = Utils.getUidFromLoc(signLoc);
             if (uid == null) return;
-            FileConfiguration signData = ConfigManager.signData;
+            FileConfiguration signData = LeaderConfig.signData;
             signData.set(uid, null);
-            ConfigManager.saveSignData();
-            e.getPlayer().sendMessage(ConfigManager.signRemoved);
+            LeaderConfig.saveSignData();
+            e.getPlayer().sendMessage(LeaderConfig.signRemoved);
         });
     }
 
@@ -128,12 +129,14 @@ public class onSignEvent implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String uid = Utils.getUidFromLoc(sign.getLocation());
             if (uid == null) return;
-            String item = ConfigManager.signData.getString(uid + ".item");
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                Utils.getItem(item).ifPresent(leaderBoard -> {
-                    player.openInventory(LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard));
+            String item = LeaderConfig.signData.getString(uid + ".item");
+            Utils.getItem(item).ifPresent(leaderBoard -> {
+                Inventory inv = LeaderInventoryManager.getInstance().getLeaderInventory(leaderBoard);
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    player.openInventory(inv);
                 });
             });
+
         });
 
     }

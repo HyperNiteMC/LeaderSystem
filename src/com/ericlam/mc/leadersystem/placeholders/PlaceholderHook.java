@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.placeholders;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
@@ -25,7 +25,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
     public PlaceholderHook(LeaderSystem plugin) {
         this.plugin = plugin;
         leaderBoardManager = LeaderBoardManager.getInstance();
-        NOT_IN_LIMIT = "不在前" + ConfigManager.selectLimit + "名之內";
+        NOT_IN_LIMIT = "不在前" + LeaderConfig.selectLimit + "名之內";
     }
 
     @Override

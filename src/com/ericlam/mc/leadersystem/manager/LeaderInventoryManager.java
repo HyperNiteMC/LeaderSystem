@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
@@ -48,9 +48,9 @@ public class LeaderInventoryManager {
 
     private Inventory getLeaderInventoryFromSQL(Connection connection, LeaderBoard leaderBoard) throws SQLException {
         String item = leaderBoard.getItem();
-        Inventory inv = new InventoryBuilder(ConfigManager.guiRow, leaderBoard.getInvTitle()).build();
+        Inventory inv = new InventoryBuilder(LeaderConfig.guiRow, leaderBoard.getInvTitle()).build();
         List<Board> boards = new ArrayList<>(leaderBoardManager.getRanking(connection, leaderBoard));
-        for (int i = 0; i < (ConfigManager.guiRow * 9); i++) {
+        for (int i = 0; i < (LeaderConfig.guiRow * 9); i++) {
             Board board = boards.get(i);
             if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
             String invName = replaceData(leaderBoard.getInvName(), board);
@@ -68,7 +68,7 @@ public class LeaderInventoryManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new InventoryBuilder(ConfigManager.guiRow, leaderBoard.getInvTitle()).build();
+        return new InventoryBuilder(LeaderConfig.guiRow, leaderBoard.getInvTitle()).build();
     }
 
 

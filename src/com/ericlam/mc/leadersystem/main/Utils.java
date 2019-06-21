@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.main;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import org.bukkit.Bukkit;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Utils {
 
     public static Optional<LeaderBoard> getItem(String item) {
-        return ConfigManager.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
+        return LeaderConfig.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
     }
 
     public static Optional<Board> getBoard(TreeSet<Board> boards, int rank) {
@@ -45,13 +45,13 @@ public class Utils {
         String uid;
         do {
             uid = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
-        } while (ConfigManager.signData.contains(uid));
+        } while (LeaderConfig.signData.contains(uid));
         return uid;
     }
 
     @Nullable
     public static String getUidFromLoc(Location location) {
-        FileConfiguration signData = ConfigManager.signData;
+        FileConfiguration signData = LeaderConfig.signData;
         for (String key : signData.getKeys(false)) {
             Location loc = getLocationFromConfig(signData, key);
             if (loc != null && loc.equals(location)) return key;

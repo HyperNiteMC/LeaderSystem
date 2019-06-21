@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.leadersystem.config.ConfigManager;
+import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
@@ -69,7 +69,7 @@ public class LeaderBoardManager {
         String name = leaderBoard.getPlayername();
         String uuid = leaderBoard.getPlayeruuid();
         String show = leaderBoard.getDatashow();
-        int limit = ConfigManager.selectLimit;
+        int limit = LeaderConfig.selectLimit;
         String selectStmt;
         selectStmt = "SELECT "+(name.isEmpty() ? "" : "`"+name+"`,")+"`"+uuid+"`,`"+(show.isEmpty() ? column : show)+"` FROM "+table+" ORDER BY "+column+" DESC LIMIT "+limit;
         PreparedStatement use = connection.prepareStatement("USE " + database);
@@ -115,7 +115,7 @@ public class LeaderBoardManager {
     }
 
     public void forceUpdateSigns(Plugin plugin) {
-        FileConfiguration signData = ConfigManager.signData;
+        FileConfiguration signData = LeaderConfig.signData;
         ConcurrentLinkedDeque<String> signDataLinked = new ConcurrentLinkedDeque<>(signData.getKeys(false));
         while (!signDataLinked.isEmpty()) {
             String uid = signDataLinked.poll();

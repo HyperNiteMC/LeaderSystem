@@ -4,6 +4,8 @@ import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
+import com.hypernite.mc.hnmc.core.builders.sql.builder.Order;
+import com.hypernite.mc.hnmc.core.builders.sql.builder.Select;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,7 +73,12 @@ public class LeaderBoardManager {
         String show = leaderBoard.getDatashow();
         int limit = LeaderConfig.selectLimit;
         String selectStmt;
-        selectStmt = "SELECT "+(name.isEmpty() ? "" : "`"+name+"`,")+"`"+uuid+"`,`"+(show.isEmpty() ? column : show)+"` FROM "+table+" ORDER BY "+column+" DESC LIMIT "+limit;
+        Select selectBuilder = new Select().select(uuid);
+        if (!name.isEmpty()) {
+            selectBuilder.select(name);
+        }
+        selectBuilder.select(show.isEmpty() ? column : show).from(table).order(new Order().decrement(column)).limit(limit);
+        selectStmt = selectBuilder.sql();
         try (PreparedStatement use = connection.prepareStatement("USE " + database);
              PreparedStatement select = connection.prepareStatement(selectStmt);
              PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {

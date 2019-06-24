@@ -4,8 +4,6 @@ import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
-import com.hypernite.mc.hnmc.core.builders.sql.builder.Order;
-import com.hypernite.mc.hnmc.core.builders.sql.builder.Select;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -72,15 +70,11 @@ public class LeaderBoardManager {
         String uuid = leaderBoard.getPlayeruuid();
         String show = leaderBoard.getDatashow();
         int limit = LeaderConfig.selectLimit;
-        String selectStmt;
-        Select selectBuilder = new Select().select(uuid);
-        if (!name.isEmpty()) {
-            selectBuilder.select(name);
-        }
-        selectBuilder.select(show.isEmpty() ? column : show).from(table).order(new Order().decrement(column)).limit(limit);
-        selectStmt = selectBuilder.sql();
+        String a = name.isEmpty() ? "" : String.format(", `%s`", name);
+        String b = show.isEmpty() ? column : show;
+        final String stmt = "SELECT `" + uuid + "`" + a + ", `" + b + "` FROM " + table + " ORDER BY `" + column + "` DESC LIMIT " + limit;
         try (PreparedStatement use = connection.prepareStatement("USE " + database);
-             PreparedStatement select = connection.prepareStatement(selectStmt);
+             PreparedStatement select = connection.prepareStatement(stmt);
              PreparedStatement back = connection.prepareStatement("USE " + origDatabase)) {
             use.execute();
             ResultSet resultSet = select.executeQuery();

@@ -7,9 +7,9 @@ import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.builders.InventoryBuilder;
 import com.hypernite.mc.hnmc.core.builders.ItemStackBuilder;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -53,11 +53,16 @@ public class LeaderInventoryManager {
         for (int i = 0; i < (LeaderConfig.guiRow * 9); i++) {
             if (boards.size() <= i) break;
             Board board = boards.get(i);
-            if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
+            if (board.getPlayerUUID() == null) continue;
             String invName = replaceData(leaderBoard.getInvName(), board);
-            ItemStack stack = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName).head(board.getPlayerUUID(), board.getPlayerName())
-                    .lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true)).build();
-            inv.setItem(i, stack);
+            ItemStackBuilder stackBuilder = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName);
+            if (board.getPlayerName().equalsIgnoreCase(ChatColor.RED + "Name Not Found")) {
+                stackBuilder.head(board.getPlayerUUID());
+            } else {
+                stackBuilder.head(board.getPlayerUUID(), board.getPlayerName());
+            }
+            stackBuilder.lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true));
+            inv.setItem(i, stackBuilder.build());
         }
         leaderInventories.put(item, inv);
         return inv;

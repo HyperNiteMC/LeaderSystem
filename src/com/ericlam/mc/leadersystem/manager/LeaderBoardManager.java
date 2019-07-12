@@ -125,13 +125,22 @@ public class LeaderBoardManager {
             int rank = signData.getInt(uid + ".rank");
             Location loc = Utils.getLocationFromConfig(signData, uid);
             Location headLoc = Utils.getLocationFromConfig(signData, uid, "head-location");
-            if (loc == null || headLoc == null) continue;
-            if (loc.getBlock().getBlockData() instanceof WallSign) continue;
+            if (loc == null || headLoc == null) {
+                plugin.getLogger().warning("loc or headLoc is null");
+                continue;
+            }
             Block sign = loc.getBlock();
+            if (!(sign.getBlockData() instanceof WallSign)) {
+                plugin.getLogger().warning("blockdata is not wall sign");
+                continue;
+            }
             Utils.getItem(item).ifPresent(leaderBoard -> {
                 TreeSet<Board> boards = getRanking(leaderBoard);
                 Utils.getBoard(boards, rank).ifPresent(board -> {
-                    if (board.getPlayerUUID() == null || board.getPlayerName() == null) return;
+                    if (board.getPlayerUUID() == null) {
+                        plugin.getLogger().warning("uuid is null");
+                        return;
+                    }
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Sign signState = (Sign) sign.getState();
                         final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();
@@ -145,7 +154,12 @@ public class LeaderBoardManager {
                         signState.update(true);
                         sign.getState().update(true);
                         Block headBlock = headLoc.getBlock();
-                        HyperNiteMC.getAPI().getPlayerSkinManager().updateHeadBlock(board.getPlayerUUID(), board.getPlayerName(), headBlock);
+                        if (board.getPlayerName().equalsIgnoreCase("null")) {
+                            HyperNiteMC.getAPI().getPlayerSkinManager().updateHeadBlock(board.getPlayerUUID(), headBlock);
+                        } else {
+                            HyperNiteMC.getAPI().getPlayerSkinManager().updateHeadBlock(board.getPlayerUUID(), board.getPlayerName(), headBlock);
+                        }
+                        plugin.getLogger().info("sign for " + board.getPlayerUUID().toString() + " Updated");
                     });
                 });
             });

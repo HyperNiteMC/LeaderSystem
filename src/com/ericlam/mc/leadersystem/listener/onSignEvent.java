@@ -55,7 +55,7 @@ public class onSignEvent implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 TreeSet<Board> boards = leaderBoardManager.getRanking(leaderBoard);
                 Utils.getBoard(boards, rank).ifPresentOrElse(board -> {
-                    if (board.getPlayerName() == null || board.getPlayerUUID() == null) {
+                    if (board.getPlayerUUID() == null) {
                         player.sendMessage(LeaderConfig.playerNull);
                         return;
                     }
@@ -99,7 +99,11 @@ public class onSignEvent implements Listener {
                         }
                         signState.update(true);
                         sign.getState().update(true);
-                        HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), head, walled, player.getFacing().getOppositeFace());
+                        if (board.getPlayerName().equalsIgnoreCase("null")) {
+                            HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), head, walled, player.getFacing().getOppositeFace());
+                        } else {
+                            HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), head, walled, player.getFacing().getOppositeFace());
+                        }
                     });
                 }, () -> player.sendMessage(LeaderConfig.rankNull));
             });

@@ -51,6 +51,7 @@ public class LeaderInventoryManager {
         Inventory inv = new InventoryBuilder(LeaderConfig.guiRow, leaderBoard.getInvTitle()).build();
         List<Board> boards = new ArrayList<>(leaderBoardManager.getRanking(connection, leaderBoard));
         for (int i = 0; i < (LeaderConfig.guiRow * 9); i++) {
+            if (boards.size() <= i) break;
             Board board = boards.get(i);
             if (board.getPlayerName() == null || board.getPlayerUUID() == null) continue;
             String invName = replaceData(leaderBoard.getInvName(), board);

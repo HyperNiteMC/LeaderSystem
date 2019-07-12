@@ -8,6 +8,7 @@ import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -87,10 +88,11 @@ public class onSignEvent implements Listener {
                     Block head = headBlock;
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Sign signState = (Sign) sign.getState();
+                        final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();
                         for (int i = 0; i < 4; i++) {
                             String line = leaderBoard.getSigns().get(i)
                                     .replaceAll("<rank>", board.getRank() + "")
-                                    .replaceAll("<player>", board.getPlayerName())
+                                    .replaceAll("<player>", playerName)
                                     .replaceAll("<data>", board.getDataShow());
                             signState.setLine(i, line);
                             e.setLine(i, line);

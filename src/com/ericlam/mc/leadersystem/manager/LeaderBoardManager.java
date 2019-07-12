@@ -6,6 +6,7 @@ import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -24,15 +25,14 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LeaderBoardManager {
     private static LeaderBoardManager leaderBoardManager;
+    private HashMap<String, TreeSet<Board>> caching = new HashMap<>();
+    private Set<LeaderBoard> usingLeaderBoards = new HashSet<>();
+    private BukkitTask updateTask, signUpdateTask;
 
     public static LeaderBoardManager getInstance() {
         if (leaderBoardManager == null) leaderBoardManager = new LeaderBoardManager();
         return leaderBoardManager;
     }
-
-    private HashMap<String, TreeSet<Board>> caching = new HashMap<>();
-    private Set<LeaderBoard> usingLeaderBoards = new HashSet<>();
-    private BukkitTask updateTask, signUpdateTask;
 
     public TreeSet<Board> getRanking(LeaderBoard leaderBoard) {
         String item = leaderBoard.getItem();
@@ -80,15 +80,15 @@ public class LeaderBoardManager {
             ResultSet resultSet = select.executeQuery();
             back.execute();
             int i = 1;
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 String playername = name.isEmpty() ? "" : resultSet.getString(name);
                 UUID playeruuid = UUID.fromString(resultSet.getString(uuid));
                 String datashow = show.isEmpty() ? "" : resultSet.getString(show);
                 int data = resultSet.getInt(column);
-                boards.add(new Board(i,playeruuid,playername,data,datashow));
+                boards.add(new Board(i, playeruuid, playername, data, datashow));
                 i++;
             }
-            caching.put(leaderBoard.getItem(),boards);
+            caching.put(leaderBoard.getItem(), boards);
             return boards;
         }
     }
@@ -134,10 +134,11 @@ public class LeaderBoardManager {
                     if (board.getPlayerUUID() == null || board.getPlayerName() == null) return;
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         Sign signState = (Sign) sign.getState();
+                        final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();
                         for (int i = 0; i < 4; i++) {
                             String line = leaderBoard.getSigns().get(i)
                                     .replaceAll("<rank>", board.getRank() + "")
-                                    .replaceAll("<player>", board.getPlayerName())
+                                    .replaceAll("<player>", playerName)
                                     .replaceAll("<data>", board.getDataShow());
                             signState.setLine(i, line);
                         }
@@ -147,8 +148,8 @@ public class LeaderBoardManager {
                         HyperNiteMC.getAPI().getPlayerSkinManager().updateHeadBlock(board.getPlayerUUID(), board.getPlayerName(), headBlock);
                     });
                 });
-                });
-            }
+            });
+        }
     }
 
     public void startSignUpdate(Plugin plugin) {

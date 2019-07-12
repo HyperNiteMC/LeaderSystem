@@ -1,7 +1,6 @@
 package com.ericlam.mc.leadersystem.model;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
 import javax.annotation.Nonnull;
@@ -19,7 +18,7 @@ public class Board implements Comparable<Board> {
         this.playerUUID = playerUUID;
         if (playerName.isEmpty()){
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerUUID);
-            this.playerName = Optional.ofNullable(offlinePlayer.getName()).orElse(ChatColor.RED + "Name Not Found");
+            this.playerName = Optional.ofNullable(offlinePlayer.getName()).orElse("null");
         }else{
             this.playerName = playerName;
         }

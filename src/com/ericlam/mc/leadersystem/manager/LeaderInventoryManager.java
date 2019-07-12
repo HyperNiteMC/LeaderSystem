@@ -55,11 +55,11 @@ public class LeaderInventoryManager {
             Board board = boards.get(i);
             if (board.getPlayerUUID() == null) continue;
             String invName = replaceData(leaderBoard.getInvName(), board);
-            ItemStackBuilder stackBuilder = new ItemStackBuilder(Material.PLAYER_HEAD).displayName(invName);
-            if (board.getPlayerName().equalsIgnoreCase(ChatColor.RED + "Name Not Found")) {
-                stackBuilder.head(board.getPlayerUUID());
+            ItemStackBuilder stackBuilder = new ItemStackBuilder(Material.PLAYER_HEAD);
+            if (board.getPlayerName().equalsIgnoreCase("null")) {
+                stackBuilder.head(board.getPlayerUUID()).displayName(ChatColor.RED + "[! 找不到名稱]");
             } else {
-                stackBuilder.head(board.getPlayerUUID(), board.getPlayerName());
+                stackBuilder.head(board.getPlayerUUID(), board.getPlayerName()).displayName(invName);
             }
             stackBuilder.lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true));
             inv.setItem(i, stackBuilder.build());

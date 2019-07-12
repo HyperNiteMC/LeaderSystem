@@ -1,6 +1,6 @@
 name: LeaderSystem
 main: com.ericlam.mc.leadersystem.main.LeaderSystem
-version: "1.2.9"
+version: "1.3.1"
 author: Hydranapse_
 depend: [HyperNiteMC-Core]
 api-version: "1.13"

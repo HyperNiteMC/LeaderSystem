@@ -9,9 +9,17 @@ import com.ericlam.mc.leadersystem.placeholders.PlaceholderHook;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeaderSystem extends JavaPlugin {
+
+    private static LeaderConfig leaderConfig;
+
+    public static LeaderConfig getLeaderConfig() {
+        return leaderConfig;
+    }
+
     @Override
     public void onEnable() {
-        new LeaderConfig(this).loadMessages();
+        leaderConfig = new LeaderConfig(this);
+        leaderConfig.loadMessages();
         this.getLogger().info("LeaderSystem Enabled.");
         this.getServer().getPluginManager().registerEvents(new onSignEvent(this), this);
         new LeaderSystemCommand(this).register();

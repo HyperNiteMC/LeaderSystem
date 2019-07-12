@@ -42,6 +42,11 @@ public class LeaderConfig extends ConfigSetter {
         }
     }
 
+    public void reloadConfig() {
+        configManager.reloadAllConfigs();
+        this.loadMessages();
+    }
+
     private String translate(String path) {
         return configManager.getMessage(path);
     }
@@ -72,6 +77,7 @@ public class LeaderConfig extends ConfigSetter {
     @Override
     public void loadConfig(Map<String, FileConfiguration> map) {
         signData = map.get("signs.yml");
+        leaderBoards.clear();
         FileConfiguration leader = map.get("leaders.yml");
         for (String key : leader.getKeys(false)) {
             String database = leader.getString(key + ".database");

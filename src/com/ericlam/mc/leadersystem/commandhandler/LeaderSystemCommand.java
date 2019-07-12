@@ -10,6 +10,7 @@ import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import com.hypernite.mc.hnmc.core.misc.commands.*;
 import com.hypernite.mc.hnmc.core.misc.permission.Perm;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -26,6 +27,13 @@ public class LeaderSystemCommand {
                 .execute((commandSender, list) -> {
                     new ForceUpdateCommand(leaderSystem).runTaskAsynchronously(leaderSystem);
                     commandSender.sendMessage(LeaderConfig.forceUpdated);
+                    return true;
+                }).build();
+
+        CommandNode reload = new CommandNodeBuilder("reload").description("重載 yml").permission(Perm.ADMIN)
+                .execute((commandSender, list) -> {
+                    LeaderSystem.getLeaderConfig().reloadConfig();
+                    commandSender.sendMessage(ChatColor.GREEN + "重載成功。");
                     return true;
                 }).build();
 
@@ -75,7 +83,7 @@ public class LeaderSystemCommand {
                     return true;
                 }).build();
 
-        this.root = new DefaultCommandBuilder("leadersystem").description("LeaderSystem 主指令").children(update, get, inv).build();
+        this.root = new DefaultCommandBuilder("leadersystem").description("LeaderSystem 主指令").children(update, get, inv, reload).build();
     }
 
 

@@ -16,6 +16,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="HyperNiteMC-Core" level="project" />
+    <orderEntry type="library" name="HyperNiteMC-API" level="project" />
   </component>
 </module>

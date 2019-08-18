@@ -1,16 +1,25 @@
 package com.ericlam.mc.leadersystem.config;
 
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
+import com.ericlam.mc.leadersystem.sign.SignData;
 import com.hypernite.mc.hnmc.core.config.ConfigSetter;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import com.hypernite.mc.hnmc.core.managers.ConfigManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class LeaderConfig extends ConfigSetter {
@@ -22,6 +31,7 @@ public class LeaderConfig extends ConfigSetter {
     private static File signDataFile;
     private static Plugin plugin;
     private ConfigManager configManager;
+    public static final Map<Sign, SignData> signDataMap = new ConcurrentHashMap<>();
 
     public LeaderConfig(Plugin plugin) {
         super(plugin, "leaders.yml", "lang.yml", "signs.yml", "config.yml");
@@ -77,6 +87,22 @@ public class LeaderConfig extends ConfigSetter {
     @Override
     public void loadConfig(Map<String, FileConfiguration> map) {
         signData = map.get("signs.yml");
+        signDataMap.clear();
+        for (String key : signData.getKeys(false)) {
+            String item = signData.getString(key.concat(".item"));
+            int rank = signData.getInt(key.concat(".rank"));
+            String w = signData.getString(key.concat(".world"));
+            World world = w == null ? null : Bukkit.getWorld(w);
+            if (world == null) continue;
+            Vector v = Optional.ofNullable(signData.getConfigurationSection(key.concat(".head-location"))).map(s -> Vector.deserialize(s.getValues(false))).orElse(null);
+            BlockVector vector = v == null ? null : v.toBlockVector();
+            Vector signV = Optional.ofNullable(signData.getConfigurationSection(key.concat(".sign-location"))).map(s -> Vector.deserialize(s.getValues(false))).orElse(null);
+            if (signV == null) continue;
+            Location loc = signV.toLocation(world);
+            if (!(loc.getBlock().getState() instanceof WallSign)) return;
+            Sign sign = (Sign) loc.getBlock().getState(false);
+            signDataMap.put(sign, new SignData(item, key, rank, world, vector));
+        }
         leaderBoards.clear();
         FileConfiguration leader = map.get("leaders.yml");
         for (String key : leader.getKeys(false)) {

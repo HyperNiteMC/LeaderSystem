@@ -18,14 +18,13 @@ public class PlaceholderHook extends PlaceholderExpansion {
     private final Plugin plugin;
     private final LeaderBoardManager leaderBoardManager;
 
-    private final String NO_THIS_STATISTIC = "無此戰績";
-    private final String NOT_ENOUGH_ARGS = "格式錯誤";
-    private final String NOT_IN_LIMIT;
+    private static final String NO_THIS_STATISTIC = "無此戰績";
+    private static final String NOT_ENOUGH_ARGS = "格式錯誤";
+    private static final String NOT_IN_LIMIT = "不在前" + LeaderConfig.selectLimit + "名之內";
 
     public PlaceholderHook(LeaderSystem plugin) {
         this.plugin = plugin;
-        leaderBoardManager = LeaderBoardManager.getInstance();
-        NOT_IN_LIMIT = "不在前" + LeaderConfig.selectLimit + "名之內";
+        leaderBoardManager = LeaderSystem.getLeaderBoardManager();
     }
 
     @Override
@@ -38,7 +37,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
         if (leaderBoard.isEmpty()) {
             return NO_THIS_STATISTIC;
         }
-        TreeSet<Board> boardList = leaderBoardManager.getRanking(leaderBoard.get());
+        TreeSet<Board> boardList = leaderBoardManager.getCaching().getOrDefault(args[1], new TreeSet<>());
         switch (args[0]) {
             case "rank":
                 Optional<Board> board = Utils.getBoard(boardList, p.getUniqueId());

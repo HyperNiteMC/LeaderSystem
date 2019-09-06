@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class onSignEvent implements Listener {
     private final Plugin plugin;
@@ -56,15 +57,20 @@ public class onSignEvent implements Listener {
                 return;
             }
             Optional<Board> boardOptional = Utils.getBoard(boards, rank);
+            Board board;
+
             if (boardOptional.isEmpty()) {
                 player.sendMessage(LeaderConfig.rankNull);
-                return;
+                board = new Board(rank, UUID.randomUUID(), "???", 9999, "???");
+            } else {
+                board = boardOptional.get();
             }
-            Board board = boardOptional.get();
+
             if (board.getPlayerUUID() == null) {
                 player.sendMessage(LeaderConfig.playerNull);
                 return;
             }
+
             Vector headVector = sign.getLocation().add(0, 1, 0).toVector();
             Block headBlock = headVector.toLocation(sign.getWorld()).getBlock();
             boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(headBlock);
@@ -121,7 +127,5 @@ public class onSignEvent implements Listener {
             }
             Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inv));
         }));
-
-
     }
 }

@@ -4,12 +4,16 @@ import com.ericlam.mc.leadersystem.config.LeaderConfig;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.ericlam.mc.leadersystem.sign.SignData;
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
@@ -82,6 +86,18 @@ public class Utils {
         if (board.getPlayerUUID() == null) {
             Bukkit.getLogger().warning("[LeaderSystem] sign data is null, skipped.");
             return;
+        }
+        BlockVector headVector = data.getHeadLocation();
+        if (headVector != null) {
+            Block head = headVector.toLocation(data.getWorld()).getBlock();
+            boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(head);
+            Rotatable rotatable = (Rotatable) head.getBlockData();
+            BlockFace face = rotatable.getRotation();
+            if (board.getPlayerName().equalsIgnoreCase("null")) {
+                HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), head, walled, face);
+            } else {
+                HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), head, walled, face);
+            }
         }
         signState.setEditable(true);
         final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();

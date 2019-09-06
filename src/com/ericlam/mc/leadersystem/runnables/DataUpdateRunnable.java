@@ -14,7 +14,8 @@ public class DataUpdateRunnable extends BukkitRunnable {
     @Override
     public void run() {
         leaderSystem.getClearCache().run();
-        new SignUpdateRunnable(LeaderSystem.getLeaderBoardManager()).runTaskLater(leaderSystem, 300L);
+        if (!SignUpdateRunnable.running)
+            new SignUpdateRunnable(LeaderSystem.getLeaderBoardManager()).runTaskLater(leaderSystem, 300L);
 
     }
 }

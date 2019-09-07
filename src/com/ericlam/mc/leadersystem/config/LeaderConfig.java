@@ -10,7 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BlockVector;
@@ -93,14 +92,24 @@ public class LeaderConfig extends ConfigSetter {
             int rank = signData.getInt(key.concat(".rank"));
             String w = signData.getString(key.concat(".world"));
             World world = w == null ? null : Bukkit.getWorld(w);
-            if (world == null) continue;
+            if (world == null) {
+                plugin.getLogger().warning("world is null");
+                continue;
+            }
             Vector v = Optional.ofNullable(signData.getConfigurationSection(key.concat(".head-location"))).map(s -> Vector.deserialize(s.getValues(false))).orElse(null);
             BlockVector vector = v == null ? null : v.toBlockVector();
-            Vector signV = Optional.ofNullable(signData.getConfigurationSection(key.concat(".sign-location"))).map(s -> Vector.deserialize(s.getValues(false))).orElse(null);
-            if (signV == null) continue;
+            Vector signV = Optional.ofNullable(signData.getConfigurationSection(key.concat(".location"))).map(s -> Vector.deserialize(s.getValues(false))).orElse(null);
+            if (signV == null) {
+                plugin.getLogger().warning("sign location vector is null");
+                continue;
+            }
             Location loc = signV.toLocation(world);
-            if (!(loc.getBlock().getState() instanceof WallSign)) return;
+            if (!(loc.getBlock().getState() instanceof Sign)) {
+                plugin.getLogger().warning(" location block is not a sign");
+                continue;
+            }
             Sign sign = (Sign) loc.getBlock().getState(false);
+            plugin.getLogger().info("added " + key + " to sign map cache");
             signDataMap.put(sign, new SignData(item, key, rank, world, vector));
         }
         leaderBoards.clear();

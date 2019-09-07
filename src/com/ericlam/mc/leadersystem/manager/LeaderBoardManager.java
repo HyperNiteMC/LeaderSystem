@@ -81,7 +81,7 @@ public class LeaderBoardManager {
         LeaderConfig.signDataMap.forEach((k, v) -> {
             TreeSet<Board> boards = caching.get(v.getItem());
             if (boards == null) return;
-            Utils.getItem(v.getItem()).ifPresent(leaderBoard -> Utils.assignData(k, boards, leaderBoard));
+            Utils.getItem(v.getItem()).ifPresent(leaderBoard -> Utils.assignData(k, boards, leaderBoard, null));
         });
     }
 }

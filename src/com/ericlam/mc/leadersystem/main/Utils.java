@@ -11,6 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.BlockVector;
@@ -71,7 +73,7 @@ public class Utils {
         });
     }
 
-    public static void assignData(@Nonnull Sign signState, @Nonnull TreeSet<Board> boards, @Nonnull LeaderBoard leaderBoard) {
+    public static void assignData(@Nonnull Sign signState, @Nonnull TreeSet<Board> boards, @Nonnull LeaderBoard leaderBoard, @Nullable BlockFace newFace) {
         SignData data = Utils.getSignData(signState);
         if (data == null) {
             Bukkit.getLogger().warning("[LeaderSystem] sign data is null, skipped");
@@ -91,14 +93,25 @@ public class Utils {
         if (headVector != null) {
             Block head = headVector.toLocation(data.getWorld()).getBlock();
             boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(head);
-            Rotatable rotatable = (Rotatable) head.getBlockData();
-            BlockFace face = rotatable.getRotation();
+            BlockFace face;
+            BlockData blockData = head.getBlockData();
+            if (blockData instanceof Directional) {
+                face = ((Directional) blockData).getFacing();
+            } else if (blockData instanceof Rotatable) {
+                face = ((Rotatable) blockData).getRotation();
+            } else if (newFace != null) {
+                face = newFace;
+            } else {
+                Bukkit.getLogger().warning("[LeaderSystem] " + headVector.toString() + " is not a player head");
+                return;
+            }
             if (board.getPlayerName().equalsIgnoreCase("null")) {
                 HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), head, walled, face);
             } else {
                 HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), head, walled, face);
             }
         }
+
         signState.setEditable(true);
         final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();
         for (int i = 0; i < 4; i++) {

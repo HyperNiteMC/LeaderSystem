@@ -6,7 +6,6 @@ import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.ericlam.mc.leadersystem.sign.SignData;
-import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -84,12 +83,7 @@ public class onSignEvent implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 Sign signState = (Sign) sign.getState(false);
                 LeaderConfig.signDataMap.put(signState, new SignData(leaderBoard.getItem(), uid, board.getRank(), sign.getWorld(), Head.getLocation().toVector().toBlockVector()));
-                Utils.assignData(signState, boards, leaderBoard);
-                if (board.getPlayerName().equalsIgnoreCase("null")) {
-                    HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), Head, walled, player.getFacing().getOppositeFace());
-                } else {
-                    HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), board.getPlayerName(), Head, walled, player.getFacing().getOppositeFace());
-                }
+                Utils.assignData(signState, boards, leaderBoard, player.getFacing().getOppositeFace());
                 player.sendMessage(LeaderConfig.createSignSuccess);
             }, 10L);
             Utils.saveSignData(e.getBlock(), board, leaderBoard, headVector, uid);

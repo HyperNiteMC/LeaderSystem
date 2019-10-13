@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.placeholders;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
@@ -20,7 +20,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     private static final String NO_THIS_STATISTIC = "無此戰績";
     private static final String NOT_ENOUGH_ARGS = "格式錯誤";
-    private static final String NOT_IN_LIMIT = "不在前" + LeaderConfig.selectLimit + "名之內";
+    private static final String NOT_IN_LIMIT = "不在前" + LeaderConfigLegacy.selectLimit + "名之內";
 
     public PlaceholderHook(LeaderSystem plugin) {
         this.plugin = plugin;

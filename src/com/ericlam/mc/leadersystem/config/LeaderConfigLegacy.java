@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class LeaderConfig extends ConfigSetter {
+public class LeaderConfigLegacy extends ConfigSetter {
     public static FileConfiguration signData;
     public static String rankNull, notValue, playerNull, createSignSuccess, signRemoved, forceUpdated, getStatistic, getStatisticPlayer, noStatistic, notInLimit;
     public static Set<LeaderBoard> leaderBoards = new HashSet<>();
@@ -32,10 +32,10 @@ public class LeaderConfig extends ConfigSetter {
     private ConfigManager configManager;
     public static final Map<Sign, SignData> signDataMap = new ConcurrentHashMap<>();
 
-    public LeaderConfig(Plugin plugin) {
+    public LeaderConfigLegacy(Plugin plugin) {
         super(plugin, "leaders.yml", "lang.yml", "signs.yml", "config.yml");
         signDataFile = new File(plugin.getDataFolder(), "signs.yml");
-        LeaderConfig.plugin = plugin;
+        LeaderConfigLegacy.plugin = plugin;
         prefix = HyperNiteMC.getAPI().getCoreConfig().getPrefix();
         configManager = HyperNiteMC.getAPI().registerConfig(this);
         configManager.setMsgConfig("lang.yml");
@@ -83,9 +83,7 @@ public class LeaderConfig extends ConfigSetter {
     }
 
 
-    @Override
-    public void loadConfig(Map<String, FileConfiguration> map) {
-        signData = map.get("signs.yml");
+    public void loadSignData() {
         signDataMap.clear();
         for (String key : signData.getKeys(false)) {
             String item = signData.getString(key.concat(".item"));
@@ -112,6 +110,11 @@ public class LeaderConfig extends ConfigSetter {
             plugin.getLogger().info("added " + key + " to sign map cache");
             signDataMap.put(sign, new SignData(item, key, rank, world, vector));
         }
+    }
+
+    @Override
+    public void loadConfig(Map<String, FileConfiguration> map) {
+        signData = map.get("signs.yml");
         leaderBoards.clear();
         FileConfiguration leader = map.get("leaders.yml");
         for (String key : leader.getKeys(false)) {

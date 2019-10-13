@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.builders.InventoryBuilder;
@@ -41,7 +41,7 @@ public class LeaderInventoryManager {
     @Deprecated
     public CompletableFuture<Void> loadLeaderBoards() {
         CompletableFuture<Void> future = new CompletableFuture<>();
-        LeaderConfig.leaderBoards.forEach(leaderBoard -> {
+        LeaderConfigLegacy.leaderBoards.forEach(leaderBoard -> {
             if (leaderInventories.containsKey(leaderBoard.getItem())) return;
             future.thenCombineAsync(leaderBoardManager.getRanking(leaderBoard), (v, e) -> e);
         });
@@ -50,11 +50,11 @@ public class LeaderInventoryManager {
 
     private CompletableFuture<Inventory> getLeaderInventoryFromSQL(LeaderBoard leaderBoard) {
         String item = leaderBoard.getItem();
-        Inventory inv = new InventoryBuilder(LeaderConfig.guiRow, leaderBoard.getInvTitle()).build();
+        Inventory inv = new InventoryBuilder(LeaderConfigLegacy.guiRow, leaderBoard.getInvTitle()).build();
         return leaderBoardManager.getRanking(leaderBoard).thenApply(treeSet -> {
             LinkedList<Board> boards = new LinkedList<>(treeSet);
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for (int i = 0; i < (LeaderConfig.guiRow * 9); i++) {
+                for (int i = 0; i < (LeaderConfigLegacy.guiRow * 9); i++) {
                     if (boards.size() <= i) break;
                     Board board = boards.get(i);
                     if (board.getPlayerUUID() == null) continue;

@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
@@ -40,7 +40,7 @@ public class LeaderBoardManager {
         String name = leaderBoard.getPlayername();
         String uuid = leaderBoard.getPlayeruuid();
         String show = leaderBoard.getDatashow();
-        int limit = LeaderConfig.selectLimit;
+        int limit = LeaderConfigLegacy.selectLimit;
         String a = name.isEmpty() ? "" : String.format(", `%s`", name);
         String b = show.isEmpty() ? column : show;
         final String stmt = "SELECT `" + uuid + "`" + a + ", `" + b + "` FROM " + table + " ORDER BY `" + column + "` DESC LIMIT " + limit;
@@ -78,7 +78,7 @@ public class LeaderBoardManager {
     }
 
     public void updateSignData() {
-        LeaderConfig.signDataMap.forEach((k, v) -> {
+        LeaderConfigLegacy.signDataMap.forEach((k, v) -> {
             TreeSet<Board> boards = caching.get(v.getItem());
             if (boards == null) return;
             Utils.getItem(v.getItem()).ifPresent(leaderBoard -> Utils.assignData(k, boards, leaderBoard, null));

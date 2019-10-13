@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.commandhandler;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
@@ -24,13 +24,13 @@ public class LeaderSystemCommand {
         CommandNode update = new CommandNodeBuilder("update").description("強制更新排行戰績").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
                     new DataUpdateRunnable(leaderSystem).run();
-                    commandSender.sendMessage(LeaderConfig.forceUpdated);
+                    commandSender.sendMessage(LeaderConfigLegacy.forceUpdated);
                     return true;
                 }).build();
 
         CommandNode reload = new CommandNodeBuilder("reload").description("重載 yml").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
-                    LeaderSystem.getLeaderConfig().reloadConfig();
+                    LeaderSystem.getLeaderConfigLegacy().reloadConfig();
                     commandSender.sendMessage(ChatColor.GREEN + "重載成功。");
                     return true;
                 }).build();
@@ -40,7 +40,7 @@ public class LeaderSystemCommand {
                 .execute((commandSender, list) -> {
                     Optional<LeaderBoard> leaderBoardOptional = Utils.getItem(list.get(0));
                     if (leaderBoardOptional.isEmpty()) {
-                        commandSender.sendMessage(LeaderConfig.noStatistic);
+                        commandSender.sendMessage(LeaderConfigLegacy.noStatistic);
                         return true;
                     }
                     LeaderBoard leaderBoard = leaderBoardOptional.get();
@@ -56,10 +56,10 @@ public class LeaderSystemCommand {
                                 return;
                             }
                             Utils.getBoard(boardsList, player.getUniqueId()).ifPresentOrElse(board ->
-                                            player.sendMessage(LeaderConfig.getStatistic.replaceAll("<item>", leaderBoard.getItem())
+                                            player.sendMessage(LeaderConfigLegacy.getStatistic.replaceAll("<item>", leaderBoard.getItem())
                                                     .replaceAll("<rank>", board.getRank() + "")
                                                     .replaceAll("<data>", board.getDataShow())),
-                                    () -> player.sendMessage(LeaderConfig.notInLimit.replace("<limit>", LeaderConfig.selectLimit + "")));
+                                    () -> player.sendMessage(LeaderConfigLegacy.notInLimit.replace("<limit>", LeaderConfigLegacy.selectLimit + "")));
                         });
                     } else {
                         String target = list.get(1);
@@ -69,10 +69,10 @@ public class LeaderSystemCommand {
                                 return;
                             }
                             Utils.getBoard(boardsList, target).ifPresentOrElse(board ->
-                                            commandSender.sendMessage(LeaderConfig.getStatisticPlayer.replaceAll("<player>", target)
+                                            commandSender.sendMessage(LeaderConfigLegacy.getStatisticPlayer.replaceAll("<player>", target)
                                                     .replaceAll("<item>", leaderBoard.getItem())
                                                     .replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow())),
-                                    () -> commandSender.sendMessage(LeaderConfig.notInLimit.replace("<limit>", LeaderConfig.selectLimit + "")));
+                                    () -> commandSender.sendMessage(LeaderConfigLegacy.notInLimit.replace("<limit>", LeaderConfigLegacy.selectLimit + "")));
                         });
                     }
                     return true;
@@ -88,7 +88,7 @@ public class LeaderSystemCommand {
                             }
                             Bukkit.getScheduler().runTask(leaderSystem, () -> player.openInventory(inventory));
                         });
-                    }, () -> player.sendMessage(LeaderConfig.noStatistic));
+                    }, () -> player.sendMessage(LeaderConfigLegacy.noStatistic));
                     return true;
                 }).build();
         this.root = new DefaultCommandBuilder("leadersystem").description("LeaderSystem 主指令").children(update, get, inv, reload).build();

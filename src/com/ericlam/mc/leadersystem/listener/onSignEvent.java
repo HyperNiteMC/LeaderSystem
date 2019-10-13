@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.listener;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
@@ -47,7 +47,7 @@ public class onSignEvent implements Listener {
         try {
             rank = Integer.parseInt(rankStr);
         } catch (NumberFormatException ex) {
-            player.sendMessage(LeaderConfig.notValue);
+            player.sendMessage(LeaderConfigLegacy.notValue);
             return;
         }
         LeaderSystem.getLeaderBoardManager().getRanking(leaderBoard).whenComplete((boards, ex) -> {
@@ -55,18 +55,19 @@ public class onSignEvent implements Listener {
                 ex.printStackTrace();
                 return;
             }
+            //plugin.getLogger().warning(new Gson().toJson(boards));
             Optional<Board> boardOptional = Utils.getBoard(boards, rank);
             Board board;
 
             if (boardOptional.isEmpty()) {
-                player.sendMessage(LeaderConfig.rankNull);
+                player.sendMessage(LeaderConfigLegacy.rankNull);
                 board = new Board(rank, UUID.randomUUID(), "???", 9999, "???");
             } else {
                 board = boardOptional.get();
             }
 
             if (board.getPlayerUUID() == null) {
-                player.sendMessage(LeaderConfig.playerNull);
+                player.sendMessage(LeaderConfigLegacy.playerNull);
                 return;
             }
 
@@ -82,9 +83,9 @@ public class onSignEvent implements Listener {
             final String uid = headVector.toString().replaceAll("\\.0", "");
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 Sign signState = (Sign) sign.getState(false);
-                LeaderConfig.signDataMap.put(signState, new SignData(leaderBoard.getItem(), uid, board.getRank(), sign.getWorld(), Head.getLocation().toVector().toBlockVector()));
+                LeaderConfigLegacy.signDataMap.put(signState, new SignData(leaderBoard.getItem(), uid, board.getRank(), sign.getWorld(), Head.getLocation().toVector().toBlockVector()));
                 Utils.assignData(signState, boards, leaderBoard, player.getFacing().getOppositeFace());
-                player.sendMessage(LeaderConfig.createSignSuccess);
+                player.sendMessage(LeaderConfigLegacy.createSignSuccess);
             }, 10L);
             Utils.saveSignData(e.getBlock(), board, leaderBoard, headVector, uid);
         });
@@ -101,7 +102,7 @@ public class onSignEvent implements Listener {
                 ex.printStackTrace();
                 return;
             }
-            e.getPlayer().sendMessage(LeaderConfig.signRemoved);
+            e.getPlayer().sendMessage(LeaderConfigLegacy.signRemoved);
         });
     }
 

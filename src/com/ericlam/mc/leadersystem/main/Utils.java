@@ -1,6 +1,6 @@
 package com.ericlam.mc.leadersystem.main;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfig;
+import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
 import com.ericlam.mc.leadersystem.model.Board;
 import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.ericlam.mc.leadersystem.sign.SignData;
@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 public class Utils {
 
     public static Optional<LeaderBoard> getItem(String item) {
-        return LeaderConfig.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
+        return LeaderConfigLegacy.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
     }
 
     public static Optional<Board> getBoard(TreeSet<Board> boards, int rank) {
@@ -57,19 +57,19 @@ public class Utils {
         String uid;
         do {
             uid = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
-        } while (LeaderConfig.signData.contains(uid));
+        } while (LeaderConfigLegacy.signData.contains(uid));
         return uid;
     }
 
     @Nullable
     public static SignData getSignData(Sign sign) {
-        return LeaderConfig.signDataMap.get(sign);
+        return LeaderConfigLegacy.signDataMap.get(sign);
     }
 
     public static CompletableFuture<Void> removeSign(@Nonnull SignData signData) {
         return CompletableFuture.runAsync(() -> {
-            LeaderConfig.signData.set(signData.getUid(), null);
-            LeaderConfig.saveSignData();
+            LeaderConfigLegacy.signData.set(signData.getUid(), null);
+            LeaderConfigLegacy.saveSignData();
         });
     }
 
@@ -127,13 +127,13 @@ public class Utils {
 
     public static void saveSignData(Block sign, Board board, LeaderBoard leaderBoard, Vector headBlock, String uid) {
         Location signLoc = sign.getLocation();
-        FileConfiguration signData = LeaderConfig.signData;
+        FileConfiguration signData = LeaderConfigLegacy.signData;
         signData.set(uid + ".item", leaderBoard.getItem());
         signData.set(uid + ".rank", board.getRank());
         signData.set(uid + ".world", signLoc.getWorld().getName());
         signData.createSection(uid + ".location", signLoc.toVector().serialize());
         signData.createSection(uid + ".head-location", headBlock.serialize());
-        LeaderConfig.saveSignData();
+        LeaderConfigLegacy.saveSignData();
     }
 
 

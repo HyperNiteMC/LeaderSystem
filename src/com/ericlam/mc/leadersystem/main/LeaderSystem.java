@@ -46,7 +46,7 @@ public class LeaderSystem extends JavaPlugin {
             leaderBoardManager.clearCache();
             leaderInventoryManager.clearCache();
         };
-        new DataUpdateRunnable(this).runTaskTimerAsynchronously(this, Tools.randomWithRange(1200, 3600) * 20L, 3600 * 20L);
+        new DataUpdateRunnable(this).runTaskTimer(this, Tools.randomWithRange(1200, 3600) * 20L, 3600 * 20L);
         new LeaderSystemCommand(this).register();
         if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             this.getLogger().info("Found PlaceholderAPI! registering placeholders...");

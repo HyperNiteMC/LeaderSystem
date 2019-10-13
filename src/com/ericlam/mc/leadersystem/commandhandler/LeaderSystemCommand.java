@@ -23,7 +23,7 @@ public class LeaderSystemCommand {
         this.leaderSystem = leaderSystem;
         CommandNode update = new CommandNodeBuilder("update").description("強制更新排行戰績").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
-                    new DataUpdateRunnable(leaderSystem).run();
+                    new DataUpdateRunnable(leaderSystem).runTask(leaderSystem);
                     commandSender.sendMessage(LeaderConfigLegacy.forceUpdated);
                     return true;
                 }).build();

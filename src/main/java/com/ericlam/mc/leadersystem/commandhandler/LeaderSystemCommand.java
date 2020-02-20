@@ -1,11 +1,13 @@
 package com.ericlam.mc.leadersystem.commandhandler;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
+import com.ericlam.mc.leadersystem.config.LangConfig;
+import com.ericlam.mc.leadersystem.config.LeadersConfig;
+import com.ericlam.mc.leadersystem.config.MainConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
-import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.ericlam.mc.leadersystem.runnables.DataUpdateRunnable;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
+import com.hypernite.mc.hnmc.core.managers.YamlManager;
 import com.hypernite.mc.hnmc.core.misc.commands.*;
 import com.hypernite.mc.hnmc.core.misc.permission.Perm;
 import org.bukkit.Bukkit;
@@ -20,17 +22,21 @@ public class LeaderSystemCommand {
 
 
     public LeaderSystemCommand(LeaderSystem leaderSystem) {
+        YamlManager manager = LeaderSystem.getYamlManager();
+        LeadersConfig leadersConfig = manager.getConfigAs(LeadersConfig.class);
+        LangConfig msg = manager.getConfigAs(LangConfig.class);
+        MainConfig config = manager.getConfigAs(MainConfig.class);
         this.leaderSystem = leaderSystem;
         CommandNode update = new CommandNodeBuilder("update").description("強制更新排行戰績").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
                     new DataUpdateRunnable(leaderSystem).runTask(leaderSystem);
-                    commandSender.sendMessage(LeaderConfigLegacy.forceUpdated);
+                    commandSender.sendMessage(msg.get("force-updated"));
                     return true;
                 }).build();
 
         CommandNode reload = new CommandNodeBuilder("reload").description("重載 yml").permission(Perm.ADMIN)
                 .execute((commandSender, list) -> {
-                    LeaderSystem.getLeaderConfigLegacy().reloadConfig();
+                    leadersConfig.reload();
                     commandSender.sendMessage(ChatColor.GREEN + "重載成功。");
                     return true;
                 }).build();
@@ -38,41 +44,41 @@ public class LeaderSystemCommand {
         CommandNode get = new CommandNodeBuilder("get").description("獲得自己/別人戰績的排行與數值").permission(Perm.ADMIN)
                 .placeholder("<stats> [player]")
                 .execute((commandSender, list) -> {
-                    Optional<LeaderBoard> leaderBoardOptional = Utils.getItem(list.get(0));
+                    Optional<LeadersConfig.LeaderBoard> leaderBoardOptional = Utils.getItem(list.get(0));
                     if (leaderBoardOptional.isEmpty()) {
-                        commandSender.sendMessage(LeaderConfigLegacy.noStatistic);
+                        commandSender.sendMessage(msg.get("no-statistic"));
                         return true;
                     }
-                    LeaderBoard leaderBoard = leaderBoardOptional.get();
+                    LeadersConfig.LeaderBoard leaderBoard = leaderBoardOptional.get();
                     if (list.size() < 2) {
                         if (!(commandSender instanceof Player)) {
                             commandSender.sendMessage("not player");
                             return true;
                         }
                         Player player = (Player) commandSender;
-                        LeaderSystem.getLeaderBoardManager().getRanking(leaderBoard).whenComplete((boardsList, ex) -> {
+                        LeaderSystem.getLeaderBoardManager().getRanking(list.get(0)).whenComplete((boardsList, ex) -> {
                             if (ex != null) {
                                 ex.printStackTrace();
                                 return;
                             }
                             Utils.getBoard(boardsList, player.getUniqueId()).ifPresentOrElse(board ->
-                                            player.sendMessage(LeaderConfigLegacy.getStatistic.replaceAll("<item>", leaderBoard.getItem())
+                                            player.sendMessage(msg.get("get-statistic").replaceAll("<item>", list.get(0))
                                                     .replaceAll("<rank>", board.getRank() + "")
                                                     .replaceAll("<data>", board.getDataShow())),
-                                    () -> player.sendMessage(LeaderConfigLegacy.notInLimit.replace("<limit>", LeaderConfigLegacy.selectLimit + "")));
+                                    () -> player.sendMessage(msg.get("not-in-limit").replace("<limit>", config.selectLimit + "")));
                         });
                     } else {
                         String target = list.get(1);
-                        LeaderSystem.getLeaderBoardManager().getRanking(leaderBoard).whenComplete((boardsList, ex) -> {
+                        LeaderSystem.getLeaderBoardManager().getRanking(list.get(0)).whenComplete((boardsList, ex) -> {
                             if (ex != null) {
                                 ex.printStackTrace();
                                 return;
                             }
                             Utils.getBoard(boardsList, target).ifPresentOrElse(board ->
-                                            commandSender.sendMessage(LeaderConfigLegacy.getStatisticPlayer.replaceAll("<player>", target)
-                                                    .replaceAll("<item>", leaderBoard.getItem())
+                                            commandSender.sendMessage(msg.get("get-statistic-player").replaceAll("<player>", target)
+                                                    .replaceAll("<item>", list.get(0))
                                                     .replaceAll("<rank>", board.getRank() + "").replaceAll("<data>", board.getDataShow())),
-                                    () -> commandSender.sendMessage(LeaderConfigLegacy.notInLimit.replace("<limit>", LeaderConfigLegacy.selectLimit + "")));
+                                    () -> commandSender.sendMessage(msg.get("not-in-limit").replace("<limit>", config.selectLimit + "")));
                         });
                     }
                     return true;
@@ -81,14 +87,14 @@ public class LeaderSystemCommand {
         CommandNode inv = new AdvCommandNodeBuilder<Player>("inv").description("打開該戰績的排行界面").alias("openinv", "gui").placeholder("<stats>")
                 .execute((player, list) -> {
                     Utils.getItem(list.get(0)).ifPresentOrElse(leaderBoard -> {
-                        LeaderSystem.getLeaderInventoryManager().getLeaderInventory(leaderBoard).whenComplete((inventory, ex) -> {
+                        LeaderSystem.getLeaderInventoryManager().getLeaderInventory(list.get(0), leaderBoard).whenComplete((inventory, ex) -> {
                             if (ex != null) {
                                 ex.printStackTrace();
                                 return;
                             }
                             Bukkit.getScheduler().runTask(leaderSystem, () -> player.openInventory(inventory));
                         });
-                    }, () -> player.sendMessage(LeaderConfigLegacy.noStatistic));
+                    }, () -> player.sendMessage(msg.get("no-statistic")));
                     return true;
                 }).build();
         this.root = new DefaultCommandBuilder("leadersystem").description("LeaderSystem 主指令").children(update, get, inv, reload).build();

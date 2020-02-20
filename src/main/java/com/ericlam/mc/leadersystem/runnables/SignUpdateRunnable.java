@@ -1,15 +1,14 @@
 package com.ericlam.mc.leadersystem.runnables;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
+import com.ericlam.mc.leadersystem.config.SignConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SignUpdateRunnable extends BukkitRunnable {
 
-    private LeaderBoardManager boardManager;
-
     static boolean running = false;
+    private LeaderBoardManager boardManager;
 
     public SignUpdateRunnable(LeaderBoardManager boardManager) {
         this.boardManager = boardManager;
@@ -18,7 +17,7 @@ public class SignUpdateRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (LeaderConfigLegacy.signDataMap.isEmpty()) return;
+        if (LeaderSystem.getYamlManager().getConfigAs(SignConfig.class).signs.isEmpty()) return;
         if (!boardManager.getCaching().isEmpty()) {
             boardManager.updateSignData();
             running = false;

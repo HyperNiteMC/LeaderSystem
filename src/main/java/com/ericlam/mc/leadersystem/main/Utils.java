@@ -1,34 +1,35 @@
 package com.ericlam.mc.leadersystem.main;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
+import com.ericlam.mc.leadersystem.config.LeadersConfig;
+import com.ericlam.mc.leadersystem.config.SignConfig;
 import com.ericlam.mc.leadersystem.model.Board;
-import com.ericlam.mc.leadersystem.model.LeaderBoard;
-import com.ericlam.mc.leadersystem.sign.SignData;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class Utils {
 
-    public static Optional<LeaderBoard> getItem(String item) {
-        return LeaderConfigLegacy.leaderBoards.stream().filter(leaderBoard -> leaderBoard.getItem().equals(item)).findAny();
+
+    public static Optional<LeadersConfig.LeaderBoard> getItem(String item) {
+        return Optional.ofNullable(LeaderSystem.getYamlManager().getConfigAs(LeadersConfig.class).stats.get(item));
     }
 
     public static Optional<Board> getBoard(TreeSet<Board> boards, int rank) {
@@ -53,33 +54,45 @@ public class Utils {
         }).findAny();
     }
 
-    private static String uidGenerator() {
-        String uid;
-        do {
-            uid = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
-        } while (LeaderConfigLegacy.signData.contains(uid));
-        return uid;
+    @Nullable
+    public static Sign getState(SignConfig.SignData data) {
+        var vector = data.signLocation;
+        World world = Bukkit.getWorld(data.world);
+        if (world == null) return null;
+        Block block = world.getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+        if (!(block.getState() instanceof Sign)) return null;
+        return (Sign) block.getState(false);
     }
 
     @Nullable
-    public static SignData getSignData(Sign sign) {
-        return LeaderConfigLegacy.signDataMap.get(sign);
+    public static SignConfig.SignData getSignData(BlockVector vector) {
+        return LeaderSystem.getYamlManager().getConfigAs(SignConfig.class).signs.values().stream().filter(data -> data.signLocation.equals(vector)).findAny().orElse(null);
     }
 
-    public static CompletableFuture<Void> removeSign(@Nonnull SignData signData) {
+
+    public static CompletableFuture<Void> removeSign(@Nonnull SignConfig.SignData signData) {
         return CompletableFuture.runAsync(() -> {
-            LeaderConfigLegacy.signData.set(signData.getUid(), null);
-            LeaderConfigLegacy.saveSignData();
+            var sign = LeaderSystem.getYamlManager().getConfigAs(SignConfig.class);
+            sign.signs.values().removeIf(s -> s.equals(signData));
+            try {
+                sign.save();
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
         });
     }
 
-    public static void assignData(@Nonnull Sign signState, @Nonnull TreeSet<Board> boards, @Nonnull LeaderBoard leaderBoard, @Nullable BlockFace newFace) {
-        SignData data = Utils.getSignData(signState);
+    public static String vectorToUID(Vector vector) {
+        return vector.toString().replaceAll("\\.0", "");
+    }
+
+    public static void assignData(@Nonnull Sign signState, @Nonnull TreeSet<Board> boards, @Nonnull LeadersConfig.LeaderBoard leaderBoard, @Nullable BlockFace newFace) {
+        SignConfig.SignData data = Utils.getSignData(signState.getLocation().toVector().toBlockVector());
         if (data == null) {
             Bukkit.getLogger().warning("[LeaderSystem] sign data is null, skipped");
             return;
         }
-        Optional<Board> boardOptional = Utils.getBoard(boards, data.getRank());
+        Optional<Board> boardOptional = Utils.getBoard(boards, data.rank);
         if (boardOptional.isEmpty()) {
             Bukkit.getLogger().warning("[LeaderSystem] board is empty , skipped.");
             return;
@@ -89,9 +102,11 @@ public class Utils {
             Bukkit.getLogger().warning("[LeaderSystem] sign data is null, skipped.");
             return;
         }
-        BlockVector headVector = data.getHeadLocation();
+        BlockVector headVector = data.headLocation;
+        World world = Bukkit.getWorld(data.world);
+        if (world == null) return;
         if (headVector != null) {
-            Block head = headVector.toLocation(data.getWorld()).getBlock();
+            Block head = headVector.toLocation(world).getBlock();
             boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(head);
             BlockFace face;
             BlockData blockData = head.getBlockData();
@@ -115,7 +130,7 @@ public class Utils {
         signState.setEditable(true);
         final String playerName = board.getPlayerName().equalsIgnoreCase("null") ? ChatColor.RED + "[! 找不到名稱]" : board.getPlayerName();
         for (int i = 0; i < 4; i++) {
-            String line = leaderBoard.getSigns().get(i)
+            String line = leaderBoard.sign.get(i)
                     .replaceAll("<rank>", board.getRank() + "")
                     .replaceAll("<player>", playerName)
                     .replaceAll("<data>", board.getDataShow());
@@ -123,17 +138,6 @@ public class Utils {
         }
         signState.update(true);
         Bukkit.getLogger().info("[LeaderSystem] sign data for ".concat(playerName).concat(" is updated."));
-    }
-
-    public static void saveSignData(Block sign, Board board, LeaderBoard leaderBoard, Vector headBlock, String uid) {
-        Location signLoc = sign.getLocation();
-        FileConfiguration signData = LeaderConfigLegacy.signData;
-        signData.set(uid + ".item", leaderBoard.getItem());
-        signData.set(uid + ".rank", board.getRank());
-        signData.set(uid + ".world", signLoc.getWorld().getName());
-        signData.createSection(uid + ".location", signLoc.toVector().serialize());
-        signData.createSection(uid + ".head-location", headBlock.serialize());
-        LeaderConfigLegacy.saveSignData();
     }
 
 

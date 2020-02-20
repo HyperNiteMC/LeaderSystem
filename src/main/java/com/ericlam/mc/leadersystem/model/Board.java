@@ -16,13 +16,13 @@ public class Board implements Comparable<Board> {
     public Board(int rank, UUID playerUUID, String playerName, int data, String dataShow) {
         this.rank = rank;
         this.playerUUID = playerUUID;
-        if (playerName.isEmpty()){
+        if (playerName.isEmpty()) {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerUUID);
             this.playerName = Optional.ofNullable(offlinePlayer.getName()).orElse("null");
-        }else{
+        } else {
             this.playerName = playerName;
         }
-        this.dataShow = dataShow.isEmpty() ? data+"" : dataShow;
+        this.dataShow = dataShow.isEmpty() ? data + "" : dataShow;
     }
 
     public int getRank() {

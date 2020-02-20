@@ -1,0 +1,97 @@
+stats:
+  gsg-kills:
+    table: "gamestats"
+    column: "Kills"
+    playerName: "player_name"
+    playerUuid: "player_uuid"
+    dataShow: ""
+    sign:
+      - "&4#<rank>"
+      - "&9<player>"
+      - "&c殺敵: &b<data>"
+      - ""
+    invTitle: "&6槍戰飢餓遊戲 &4- 殺敵排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b殺敵: <data>"
+  inf-kills:
+    table: "McInfected"
+    column: "Kills"
+    playerName: ""
+    playerUuid: "UUID"
+    dataShow: ""
+    sign:
+      - "&4#<rank>"
+      - "&9<player>"
+      - "&c殺敵: &b<data>"
+      - ""
+    invTitle: "&6槍戰生化模式 &4- 殺敵排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b殺敵: <data>"
+  gsg-wins:
+    table: "gamestats"
+    column: "Wins"
+    playerName: "player_name"
+    playerUuid: "player_uuid"
+    dataShow: ""
+    sign:
+      - "# <rank>"
+      - "<player>"
+      - "勝數: <data>"
+      - ""
+    invTitle: "&6槍戰飢餓遊戲 &4- 勝數排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b勝數: <data>"
+  votes:
+    table: "votes"
+    column: "votes"
+    playerName: "last_name"
+    playerUuid: "uuid"
+    dataShow: ""
+    sign:
+      - "# <rank>"
+      - "<player>"
+      - "票數: <data>"
+      - ""
+    invTitle: "&6投票排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b票數: <data>"
+  money:
+    table: "interconomy_userdata"
+    column: "money"
+    playerName: ""
+    playerUuid: "uuid"
+    dataShow: ""
+    sign:
+      - "# <rank>"
+      - "<player>"
+      - "金錢: <data>"
+      - ""
+    invTitle: "&6金錢排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b金錢: <data>"
+  inf-wins:
+    table: "McInfected"
+    column: "Wins"
+    playerName: ""
+    playerUuid: "UUID"
+    dataShow: ""
+    sign:
+      - "# <rank>"
+      - "<player>"
+      - "勝數: <data>"
+      - ""
+    invTitle: "&6槍戰生化模式 &4- 勝利排行"
+    invName: "<player>"
+    invLores:
+      - "&c&lNo. &e&l<rank>"
+      - "&b勝數: <data>"

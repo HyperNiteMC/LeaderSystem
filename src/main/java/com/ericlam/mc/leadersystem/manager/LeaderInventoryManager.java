@@ -1,8 +1,9 @@
 package com.ericlam.mc.leadersystem.manager;
 
-import com.ericlam.mc.leadersystem.config.LeaderConfigLegacy;
+import com.ericlam.mc.leadersystem.config.LeadersConfig;
+import com.ericlam.mc.leadersystem.config.MainConfig;
+import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.model.Board;
-import com.ericlam.mc.leadersystem.model.LeaderBoard;
 import com.hypernite.mc.hnmc.core.builders.InventoryBuilder;
 import com.hypernite.mc.hnmc.core.builders.ItemStackBuilder;
 import org.bukkit.Bukkit;
@@ -20,10 +21,14 @@ public class LeaderInventoryManager {
     private LeaderBoardManager leaderBoardManager;
     private HashMap<String, Inventory> leaderInventories = new HashMap<>();
     private Plugin plugin;
+    private LeadersConfig leadersConfig;
+    private MainConfig config;
 
     public LeaderInventoryManager(LeaderBoardManager leaderBoardManager, Plugin plugin) {
         this.leaderBoardManager = leaderBoardManager;
         this.plugin = plugin;
+        leadersConfig = LeaderSystem.getYamlManager().getConfigAs(LeadersConfig.class);
+        config = LeaderSystem.getYamlManager().getConfigAs(MainConfig.class);
     }
 
     public HashMap<String, Inventory> getLeaderInventories() {
@@ -41,31 +46,30 @@ public class LeaderInventoryManager {
     @Deprecated
     public CompletableFuture<Void> loadLeaderBoards() {
         CompletableFuture<Void> future = new CompletableFuture<>();
-        LeaderConfigLegacy.leaderBoards.forEach(leaderBoard -> {
-            if (leaderInventories.containsKey(leaderBoard.getItem())) return;
-            future.thenCombineAsync(leaderBoardManager.getRanking(leaderBoard), (v, e) -> e);
+        leadersConfig.stats.keySet().forEach(s -> {
+            if (leaderInventories.containsKey(s)) return;
+            future.thenCombineAsync(leaderBoardManager.getRanking(s), (v, e) -> e);
         });
         return future;
     }
 
-    private CompletableFuture<Inventory> getLeaderInventoryFromSQL(LeaderBoard leaderBoard) {
-        String item = leaderBoard.getItem();
-        Inventory inv = new InventoryBuilder(LeaderConfigLegacy.guiRow, leaderBoard.getInvTitle()).build();
-        return leaderBoardManager.getRanking(leaderBoard).thenApply(treeSet -> {
+    private CompletableFuture<Inventory> getLeaderInventoryFromSQL(String item, LeadersConfig.LeaderBoard leaderBoard) {
+        Inventory inv = new InventoryBuilder(config.guiRow, leaderBoard.invTitle).build();
+        return leaderBoardManager.getRanking(item).thenApply(treeSet -> {
             LinkedList<Board> boards = new LinkedList<>(treeSet);
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for (int i = 0; i < (LeaderConfigLegacy.guiRow * 9); i++) {
+                for (int i = 0; i < (config.guiRow * 9); i++) {
                     if (boards.size() <= i) break;
                     Board board = boards.get(i);
                     if (board.getPlayerUUID() == null) continue;
-                    String invName = replaceData(leaderBoard.getInvName(), board);
+                    String invName = replaceData(leaderBoard.invName, board);
                     ItemStackBuilder stackBuilder = new ItemStackBuilder(Material.PLAYER_HEAD);
                     if (board.getPlayerName().equalsIgnoreCase("null")) {
                         stackBuilder.head(board.getPlayerUUID()).displayName(ChatColor.RED + "[! 找不到名稱]");
                     } else {
                         stackBuilder.head(board.getPlayerUUID(), board.getPlayerName()).displayName(invName);
                     }
-                    stackBuilder.lore(leaderBoard.getLores().stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true));
+                    stackBuilder.lore(leaderBoard.invLores.stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true));
                     inv.setItem(i, stackBuilder.build());
                 }
             });
@@ -75,10 +79,9 @@ public class LeaderInventoryManager {
     }
 
 
-    public CompletableFuture<Inventory> getLeaderInventory(LeaderBoard leaderBoard) {
-        String item = leaderBoard.getItem();
+    public CompletableFuture<Inventory> getLeaderInventory(String item, LeadersConfig.LeaderBoard leaderBoard) {
         if (leaderInventories.containsKey(item)) return CompletableFuture.completedFuture(leaderInventories.get(item));
-        else return getLeaderInventoryFromSQL(leaderBoard);
+        else return getLeaderInventoryFromSQL(item, leaderBoard);
     }
 
 

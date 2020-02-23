@@ -3,7 +3,7 @@
 
     <groupId>com.ericlam.mc</groupId>
     <artifactId>LeaderSystem</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.5</version>
 
     <repositories>
         <repository>
@@ -29,8 +29,8 @@
         </dependency>
         <dependency>
             <groupId>com.hypernite.mc</groupId>
-            <artifactId>HyperNiteMC-API</artifactId>
-            <version>7.5.4</version>
+            <artifactId>core-api</artifactId>
+            <version>7.5.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

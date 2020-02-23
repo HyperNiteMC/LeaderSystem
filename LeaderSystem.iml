@@ -34,7 +34,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-commons:7.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-tree:7.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-analysis:7.3.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.hypernite.mc:HyperNiteMC-API:7.5.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.hypernite.mc:core-api:7.5.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: me.clip:placeholderapi:2.10.4" level="project" />
   </component>
 </module>

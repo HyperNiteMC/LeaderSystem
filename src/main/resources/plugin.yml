@@ -4,7 +4,7 @@ version: ${project.version}
 author: Hydranapse_
 depend: [HyperNiteMC-Core]
 softdepend: [PlaceholderAPI]
-api-version: "1.13"
+api-version: "1.15"
 commands:
   leadersystem:
     aliases: [leadersys, leader, leaderboard]

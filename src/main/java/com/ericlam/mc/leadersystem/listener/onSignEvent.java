@@ -3,6 +3,7 @@ package com.ericlam.mc.leadersystem.listener;
 import com.ericlam.mc.leadersystem.config.LangConfig;
 import com.ericlam.mc.leadersystem.config.LeadersConfig;
 import com.ericlam.mc.leadersystem.config.SignConfig;
+import com.ericlam.mc.leadersystem.config.SignVector;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
 import com.ericlam.mc.leadersystem.model.Board;
@@ -81,15 +82,15 @@ public class onSignEvent implements Listener {
 
             Vector headVector = sign.getLocation().add(0, 1, 0).toVector();
             Block headBlock = headVector.toLocation(sign.getWorld()).getBlock();
-            boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(headBlock);
+            boolean walled = Utils.isWalled(player.getFacing(), headBlock);
             if (!walled) {
                 Block signRelative = sign.getRelative(player.getFacing());
                 headVector = signRelative.getLocation().add(0, 1, 0).toVector();
             }
             final String uid = Utils.vectorToUID(headVector);
             SignConfig.SignData data = new SignConfig.SignData();
-            data.signLocation = sign.getLocation().toVector().toBlockVector();
-            data.headLocation = headVector.toBlockVector();
+            data.signLocation = SignVector.parse(sign.getLocation().toVector().toBlockVector());
+            data.headLocation = SignVector.parse(headVector.toBlockVector());
             data.world = sign.getWorld().getName();
             data.item = item;
             data.rank = rank;

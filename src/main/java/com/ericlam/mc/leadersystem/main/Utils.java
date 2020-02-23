@@ -6,6 +6,7 @@ import com.ericlam.mc.leadersystem.model.Board;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -56,7 +57,7 @@ public class Utils {
 
     @Nullable
     public static Sign getState(SignConfig.SignData data) {
-        var vector = data.signLocation;
+        var vector = data.signLocation.toBlockVector();
         World world = Bukkit.getWorld(data.world);
         if (world == null) return null;
         Block block = world.getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
@@ -66,7 +67,7 @@ public class Utils {
 
     @Nullable
     public static SignConfig.SignData getSignData(BlockVector vector) {
-        return LeaderSystem.getYamlManager().getConfigAs(SignConfig.class).signs.values().stream().filter(data -> data.signLocation.equals(vector)).findAny().orElse(null);
+        return LeaderSystem.getYamlManager().getConfigAs(SignConfig.class).signs.values().stream().filter(data -> data.signLocation.toBlockVector().equals(vector)).findAny().orElse(null);
     }
 
 
@@ -80,6 +81,10 @@ public class Utils {
                 throw new CompletionException(e);
             }
         });
+    }
+
+    public static boolean isWalled(BlockFace face, Block head) {
+        return head.getRelative(face).getType() != Material.AIR;
     }
 
     public static String vectorToUID(Vector vector) {
@@ -102,12 +107,11 @@ public class Utils {
             Bukkit.getLogger().warning("[LeaderSystem] sign data is null, skipped.");
             return;
         }
-        BlockVector headVector = data.headLocation;
+        BlockVector headVector = data.headLocation.toBlockVector();
         World world = Bukkit.getWorld(data.world);
         if (world == null) return;
         if (headVector != null) {
             Block head = headVector.toLocation(world).getBlock();
-            boolean walled = com.hypernite.mc.hnmc.core.utils.Utils.isWalled(head);
             BlockFace face;
             BlockData blockData = head.getBlockData();
             if (blockData instanceof Directional) {
@@ -120,6 +124,7 @@ public class Utils {
                 Bukkit.getLogger().warning("[LeaderSystem] " + headVector.toString() + " is not a player head");
                 return;
             }
+            boolean walled = isWalled(face.getOppositeFace(), head);
             if (board.getPlayerName().equalsIgnoreCase("null")) {
                 HyperNiteMC.getAPI().getPlayerSkinManager().setHeadBlock(board.getPlayerUUID(), head, walled, face);
             } else {
@@ -134,7 +139,7 @@ public class Utils {
                     .replaceAll("<rank>", board.getRank() + "")
                     .replaceAll("<player>", playerName)
                     .replaceAll("<data>", board.getDataShow());
-            signState.setLine(i, line);
+            signState.setLine(i, ChatColor.translateAlternateColorCodes('&', line));
         }
         signState.update(true);
         Bukkit.getLogger().info("[LeaderSystem] sign data for ".concat(playerName).concat(" is updated."));

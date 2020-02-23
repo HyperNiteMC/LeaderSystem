@@ -1,10 +1,7 @@
 package com.ericlam.mc.leadersystem.main;
 
 import com.ericlam.mc.leadersystem.commandhandler.LeaderSystemCommand;
-import com.ericlam.mc.leadersystem.config.LangConfig;
-import com.ericlam.mc.leadersystem.config.LeadersConfig;
-import com.ericlam.mc.leadersystem.config.MainConfig;
-import com.ericlam.mc.leadersystem.config.SignConfig;
+import com.ericlam.mc.leadersystem.config.*;
 import com.ericlam.mc.leadersystem.listener.onSignEvent;
 import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
 import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
@@ -14,6 +11,7 @@ import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import com.hypernite.mc.hnmc.core.managers.YamlManager;
 import com.hypernite.mc.hnmc.core.utils.Tools;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeaderSystem extends JavaPlugin {
@@ -41,6 +39,7 @@ public class LeaderSystem extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        ConfigurationSerialization.registerClass(SignVector.class);
         yamlManager = HyperNiteMC.getAPI().getFactory().getConfigFactory(this)
                 .register("config.yml", MainConfig.class)
                 .register("lang.yml", LangConfig.class)

@@ -49,7 +49,6 @@ public class LeaderSystemCommand {
                         commandSender.sendMessage(msg.get("no-statistic"));
                         return true;
                     }
-                    LeadersConfig.LeaderBoard leaderBoard = leaderBoardOptional.get();
                     if (list.size() < 2) {
                         if (!(commandSender instanceof Player)) {
                             commandSender.sendMessage("not player");

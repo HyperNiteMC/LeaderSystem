@@ -5,7 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class DataUpdateRunnable extends BukkitRunnable {
 
-    private LeaderSystem leaderSystem;
+    private final LeaderSystem leaderSystem;
 
     public DataUpdateRunnable(LeaderSystem leaderSystem) {
         this.leaderSystem = leaderSystem;

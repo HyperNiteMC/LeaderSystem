@@ -28,9 +28,9 @@ import java.util.UUID;
 
 public class onSignEvent implements Listener {
     private final Plugin plugin;
-    private LangConfig msg;
-    private SignConfig signConfig;
-    private LeadersConfig leadersConfig;
+    private final LangConfig msg;
+    private final SignConfig signConfig;
+    private final LeadersConfig leadersConfig;
 
     public onSignEvent(LeaderSystem plugin) {
         this.plugin = plugin;

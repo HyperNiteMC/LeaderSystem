@@ -10,7 +10,6 @@ import com.ericlam.mc.leadersystem.runnables.DataUpdateRunnable;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import com.hypernite.mc.hnmc.core.managers.YamlManager;
 import com.hypernite.mc.hnmc.core.utils.Tools;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -60,9 +59,5 @@ public class LeaderSystem extends JavaPlugin {
             new PlaceholderHook(this).register();
         }
         this.getLogger().info("LeaderSystem Enabled.");
-        Bukkit.getScheduler().runTask(this, () -> {
-
-            getLogger().info("Sign data loaded");
-        });
     }
 }

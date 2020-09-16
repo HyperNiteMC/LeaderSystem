@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SignUpdateRunnable extends BukkitRunnable {
 
     static boolean running = false;
-    private LeaderBoardManager boardManager;
+    private final LeaderBoardManager boardManager;
 
     public SignUpdateRunnable(LeaderBoardManager boardManager) {
         this.boardManager = boardManager;

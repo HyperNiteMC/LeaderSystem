@@ -18,11 +18,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class LeaderInventoryManager {
-    private LeaderBoardManager leaderBoardManager;
-    private HashMap<String, Inventory> leaderInventories = new HashMap<>();
-    private Plugin plugin;
-    private LeadersConfig leadersConfig;
-    private MainConfig config;
+    private final LeaderBoardManager leaderBoardManager;
+    private final HashMap<String, Inventory> leaderInventories = new HashMap<>();
+    private final Plugin plugin;
+    private final LeadersConfig leadersConfig;
+    private final MainConfig config;
 
     public LeaderInventoryManager(LeaderBoardManager leaderBoardManager, Plugin plugin) {
         this.leaderBoardManager = leaderBoardManager;

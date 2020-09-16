@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 
 public class LeaderSystemCommand {
-    private LeaderSystem leaderSystem;
-    private DefaultCommand root;
+    private final LeaderSystem leaderSystem;
+    private final DefaultCommand root;
 
 
     public LeaderSystemCommand(LeaderSystem leaderSystem) {

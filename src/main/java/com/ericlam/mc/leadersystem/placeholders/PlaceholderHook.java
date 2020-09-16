@@ -9,6 +9,7 @@ import com.ericlam.mc.leadersystem.model.Board;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.TreeSet;
@@ -27,7 +28,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(Player p, String params) {
+    public String onPlaceholderRequest(Player p, @NotNull String params) {
         if (p == null) return "";
         String[] args = params.split("_");
         if (args.length != 2) return NOT_ENOUGH_ARGS;
@@ -55,17 +56,17 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "leadersystem";
     }
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return plugin.getDescription().getAuthors().toString();
     }
 
     @Override
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return plugin.getDescription().getVersion();
     }
 }

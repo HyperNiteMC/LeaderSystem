@@ -20,11 +20,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LeaderBoardManager {
-    private Map<String, TreeSet<Board>> caching = new ConcurrentHashMap<>();
-    private SQLDataSource sqlDataSource;
-    private LeadersConfig leadersConfig;
-    private MainConfig mainConfig;
-    private SignConfig signConfig;
+    private final Map<String, TreeSet<Board>> caching = new ConcurrentHashMap<>();
+    private final SQLDataSource sqlDataSource;
+    private final LeadersConfig leadersConfig;
+    private final MainConfig mainConfig;
+    private final SignConfig signConfig;
 
     public LeaderBoardManager() {
         this.sqlDataSource = HyperNiteMC.getAPI().getSQLDataSource();

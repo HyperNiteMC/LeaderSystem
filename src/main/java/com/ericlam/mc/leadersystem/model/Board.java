@@ -8,10 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class Board implements Comparable<Board> {
-    private int rank;
-    private UUID playerUUID;
-    private String playerName;
-    private String dataShow;
+    private final int rank;
+    private final UUID playerUUID;
+    private final String playerName;
+    private final String dataShow;
 
     public Board(int rank, UUID playerUUID, String playerName, int data, String dataShow) {
         this.rank = rank;

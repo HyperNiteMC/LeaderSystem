@@ -3,7 +3,7 @@
 
     <groupId>com.ericlam.mc</groupId>
     <artifactId>LeaderSystem</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
 
     <repositories>
         <repository>
@@ -42,7 +42,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

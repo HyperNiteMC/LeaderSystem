@@ -4,7 +4,7 @@ import com.ericlam.mc.leadersystem.config.LeadersConfig;
 import com.ericlam.mc.leadersystem.config.MainConfig;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
-import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
+import com.ericlam.mc.leadersystem.manager.CacheManager;
 import com.ericlam.mc.leadersystem.model.Board;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -20,11 +20,15 @@ public class PlaceholderHook extends PlaceholderExpansion {
     private static final String NOT_ENOUGH_ARGS = "格式錯誤";
     private static final String NOT_IN_LIMIT = "不在前 %limit% 名之內";
     private final Plugin plugin;
-    private final LeaderBoardManager leaderBoardManager;
+    private final CacheManager cacheManager;
+    private final LeadersConfig leadersConfig;
+    private int selectLimit;
 
     public PlaceholderHook(LeaderSystem plugin) {
         this.plugin = plugin;
-        leaderBoardManager = LeaderSystem.getLeaderBoardManager();
+        cacheManager = plugin.getCacheManager();
+        leadersConfig = plugin.getYamlManager().getConfigAs(LeadersConfig.class);
+        selectLimit = plugin.getYamlManager().getConfigAs(MainConfig.class).selectLimit;
     }
 
     @Override
@@ -33,16 +37,16 @@ public class PlaceholderHook extends PlaceholderExpansion {
         String[] args = params.split("_");
         if (args.length != 2) return NOT_ENOUGH_ARGS;
         String item = args[1];
-        Optional<LeadersConfig.LeaderBoard> leaderBoard = Utils.getItem(item);
-        if (leaderBoard.isEmpty()) {
+        LeadersConfig.LeaderBoard leaderBoard = leadersConfig.stats.get(item);
+        if (leaderBoard == null) {
             return NO_THIS_STATISTIC;
         }
-        TreeSet<Board> boardList = leaderBoardManager.getCaching().getOrDefault(args[1], new TreeSet<>());
+        TreeSet<Board> boardList = Optional.ofNullable(cacheManager.getLeaderBoard(item)).orElseGet(TreeSet::new);
         switch (args[0]) {
             case "rank":
                 Optional<Board> board = Utils.getBoard(boardList, p.getUniqueId());
                 if (board.isEmpty())
-                    return NOT_IN_LIMIT.replace("%limit%", LeaderSystem.getYamlManager().getConfigAs(MainConfig.class).selectLimit + "");
+                    return NOT_IN_LIMIT.replace("%limit%", selectLimit + "");
                 return board.get().getRank() + "";
             case "first":
                 Optional<Board> boardFirst = Utils.getBoard(boardList, 1);

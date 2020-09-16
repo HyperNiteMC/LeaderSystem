@@ -3,9 +3,10 @@ package com.ericlam.mc.leadersystem.listener;
 import com.ericlam.mc.leadersystem.config.LangConfig;
 import com.ericlam.mc.leadersystem.config.LeadersConfig;
 import com.ericlam.mc.leadersystem.config.SignConfig;
-import com.ericlam.mc.leadersystem.config.SignVector;
 import com.ericlam.mc.leadersystem.main.LeaderSystem;
 import com.ericlam.mc.leadersystem.main.Utils;
+import com.ericlam.mc.leadersystem.manager.CacheManager;
+import com.ericlam.mc.leadersystem.manager.SignManager;
 import com.ericlam.mc.leadersystem.model.Board;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -19,10 +20,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,12 +31,17 @@ public class onSignEvent implements Listener {
     private final LangConfig msg;
     private final SignConfig signConfig;
     private final LeadersConfig leadersConfig;
+    private final CacheManager cacheManager;
+    private final SignManager signManager;
 
     public onSignEvent(LeaderSystem plugin) {
         this.plugin = plugin;
-        msg = LeaderSystem.getYamlManager().getConfigAs(LangConfig.class);
-        signConfig = LeaderSystem.getYamlManager().getConfigAs(SignConfig.class);
-        leadersConfig = LeaderSystem.getYamlManager().getConfigAs(LeadersConfig.class);
+        var yamlManager = plugin.getYamlManager();
+        msg = yamlManager.getConfigAs(LangConfig.class);
+        signConfig = yamlManager.getConfigAs(SignConfig.class);
+        leadersConfig = yamlManager.getConfigAs(LeadersConfig.class);
+        this.cacheManager = plugin.getCacheManager();
+        this.signManager = plugin.getSignManager();
     }
 
 
@@ -45,79 +50,40 @@ public class onSignEvent implements Listener {
         Block sign = e.getBlock();
         if (!(sign.getBlockData() instanceof WallSign)) return;
         Player player = e.getPlayer();
-        if (e.getLines().length < 2) return;
-        String item = e.getLine(0);
-        String rankStr = Optional.ofNullable(e.getLine(1)).orElse("");
-        LeadersConfig.LeaderBoard leaderBoard = leadersConfig.stats.get(item);
-        if (leaderBoard == null) return;
-        int rank;
+        Optional<SignManager.LeaderSign> leaderSignOptional;
         try {
-            rank = Integer.parseInt(rankStr);
+            leaderSignOptional = signManager.parseSign(e.getLines());
         } catch (NumberFormatException ex) {
             player.sendMessage(msg.get("not-value"));
             return;
         }
-        LeaderSystem.getLeaderBoardManager().getRanking(item).whenComplete((boards, ex) -> {
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
-            if (boards.isEmpty()) {
-                return;
-            }
-            Optional<Board> boardOptional = Utils.getBoard(boards, rank);
-            Board board;
+        if (leaderSignOptional.isEmpty()) return;
+        var leaderSign = leaderSignOptional.get();
+        var boards = cacheManager.getLeaderBoard(leaderSign.item);
 
-            if (boardOptional.isEmpty()) {
-                player.sendMessage(msg.get("rank-null"));
-                board = new Board(rank, UUID.randomUUID(), "???", 9999, "對方不在排名範圍內");
-            } else {
-                board = boardOptional.get();
-            }
+        Optional<Board> boardOptional = Utils.getBoard(boards, leaderSign.rank);
 
-            if (board.getPlayerUUID() == null) {
-                player.sendMessage(msg.get("player-null"));
-                return;
-            }
-
-            Vector headVector = sign.getLocation().add(0, 1, 0).toVector();
-            Block headBlock = headVector.toLocation(sign.getWorld()).getBlock();
-            boolean walled = Utils.isWalled(player.getFacing(), headBlock);
-            if (!walled) {
-                Block signRelative = sign.getRelative(player.getFacing());
-                headVector = signRelative.getLocation().add(0, 1, 0).toVector();
-            }
-            final String uid = Utils.vectorToUID(headVector);
-            SignConfig.SignData data = new SignConfig.SignData();
-            data.signLocation = SignVector.parse(sign.getLocation().toVector().toBlockVector());
-            data.headLocation = SignVector.parse(headVector.toBlockVector());
-            data.world = sign.getWorld().getName();
-            data.item = item;
-            data.rank = rank;
-            signConfig.signs.put(uid, data);
-            try {
-                signConfig.save();
-            } catch (IOException exc) {
-                exc.printStackTrace();
-            }
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                Sign signState = (Sign) sign.getState(false);
-                Utils.assignData(signState, boards, leaderBoard, player.getFacing().getOppositeFace());
-                player.sendMessage(msg.get("sign-create-success"));
-            }, 10L);
+        Board board = boardOptional.orElseGet(() -> {
+            player.sendMessage(msg.get("rank-null"));
+            return new Board(leaderSign.rank, UUID.randomUUID(), "???", 0, "對方不在排名範圍內");
         });
+
+        if (board.getPlayerUUID() == null) {
+            player.sendMessage(msg.get("player-null"));
+            return;
+        }
+
+        Sign signState = (Sign) sign.getState(false);
+        signManager.updateSign(signState, player.getFacing().getOppositeFace());
+        player.sendMessage(msg.get("sign-create-success"));
+
     }
 
     @EventHandler
     public void onSignBreak(BlockBreakEvent e) {
         if (!(e.getBlock().getState() instanceof Sign)) return;
-        SignConfig.SignData signData = Utils.getSignData(e.getBlock().getLocation().toVector().toBlockVector());
-        if (signData == null) return;
-        Utils.removeSign(signData).whenComplete((v, ex) -> {
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            signManager.removeSign((Sign) e.getBlock().getState());
             e.getPlayer().sendMessage(msg.get("sign-removed"));
         });
     }
@@ -128,14 +94,10 @@ public class onSignEvent implements Listener {
         if (e.getHand() == EquipmentSlot.OFF_HAND) return;
         if (e.getClickedBlock() == null || !(e.getClickedBlock().getState() instanceof Sign)) return;
         Player player = e.getPlayer();
-        SignConfig.SignData data = Utils.getSignData(e.getClickedBlock().getLocation().toVector().toBlockVector());
+        SignConfig.SignData data = signManager.getSignData((Sign) e.getClickedBlock().getState());
         if (data == null) return;
-        Utils.getItem(data.item).ifPresent(leaderBoard -> LeaderSystem.getLeaderInventoryManager().getLeaderInventory(data.item, leaderBoard).whenComplete((inv, ex) -> {
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
-            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inv));
-        }));
+        Inventory inventory = cacheManager.getLeaderInventory(data.item);
+        if (inventory == null) return;
+        player.openInventory(inventory);
     }
 }

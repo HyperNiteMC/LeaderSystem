@@ -3,37 +3,37 @@ package com.ericlam.mc.leadersystem.main;
 import com.ericlam.mc.leadersystem.commandhandler.LeaderSystemCommand;
 import com.ericlam.mc.leadersystem.config.*;
 import com.ericlam.mc.leadersystem.listener.onSignEvent;
-import com.ericlam.mc.leadersystem.manager.LeaderBoardManager;
-import com.ericlam.mc.leadersystem.manager.LeaderInventoryManager;
+import com.ericlam.mc.leadersystem.manager.CacheManager;
+import com.ericlam.mc.leadersystem.manager.LoadManager;
+import com.ericlam.mc.leadersystem.manager.SignManager;
 import com.ericlam.mc.leadersystem.placeholders.PlaceholderHook;
-import com.ericlam.mc.leadersystem.runnables.DataUpdateRunnable;
+import com.ericlam.mc.leadersystem.runnables.ScheduleUpdateRunnable;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import com.hypernite.mc.hnmc.core.managers.YamlManager;
-import com.hypernite.mc.hnmc.core.utils.Tools;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeaderSystem extends JavaPlugin {
 
-    private static YamlManager yamlManager;
-    private static LeaderBoardManager leaderBoardManager;
-    private static LeaderInventoryManager leaderInventoryManager;
-    private Runnable clearCache;
+    private YamlManager yamlManager;
+    private CacheManager cacheManager;
+    private LoadManager loadManager;
+    private SignManager signManager;
 
-    public static YamlManager getYamlManager() {
+    public YamlManager getYamlManager() {
         return yamlManager;
     }
 
-    public static LeaderBoardManager getLeaderBoardManager() {
-        return leaderBoardManager;
+    public CacheManager getCacheManager() {
+        return cacheManager;
     }
 
-    public static LeaderInventoryManager getLeaderInventoryManager() {
-        return leaderInventoryManager;
+    public LoadManager getLoadManager() {
+        return loadManager;
     }
 
-    public Runnable getClearCache() {
-        return clearCache;
+    public SignManager getSignManager() {
+        return signManager;
     }
 
     @Override
@@ -44,20 +44,21 @@ public class LeaderSystem extends JavaPlugin {
                 .register("lang.yml", LangConfig.class)
                 .register("leaders.yml", LeadersConfig.class)
                 .register("signs.yml", SignConfig.class).dump();
+        cacheManager = new CacheManager();
+        loadManager = new LoadManager(yamlManager);
+        signManager = new SignManager(this);
 
         this.getServer().getPluginManager().registerEvents(new onSignEvent(this), this);
-        leaderBoardManager = new LeaderBoardManager();
-        leaderInventoryManager = new LeaderInventoryManager(leaderBoardManager, this);
-        clearCache = () -> {
-            leaderBoardManager.clearCache();
-            leaderInventoryManager.clearCache();
-        };
-        new DataUpdateRunnable(this).runTaskTimer(this, Tools.randomWithRange(1200, 3600) * 20L, 3600 * 20L);
+
+        new ScheduleUpdateRunnable(this).runTaskTimer(this, 20L, 1200 * 20L);
+
         new LeaderSystemCommand(this).register();
+
         if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             this.getLogger().info("Found PlaceholderAPI! registering placeholders...");
             new PlaceholderHook(this).register();
         }
+
         this.getLogger().info("LeaderSystem Enabled.");
     }
 }

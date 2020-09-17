@@ -81,7 +81,8 @@ public class LoadManager {
                 stackBuilder.head(board.getPlayerUUID(), board.getPlayerName()).displayName(invName);
             }
             stackBuilder.lore(leaderBoard.invLores.stream().map(line -> replaceData(line, board)).collect(Collectors.toList())).onClick(e -> e.setCancelled(true));
-            inv.setItem(i, stackBuilder.build());
+            final int slot = i;
+            stackBuilder.buildWithSkin(skull -> inv.setItem(slot, skull));
         }
         return inv;
     }

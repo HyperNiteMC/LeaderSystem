@@ -3,7 +3,7 @@
 
     <groupId>com.ericlam.mc</groupId>
     <artifactId>LeaderSystem</artifactId>
-    <version>1.4.7</version>
+    <version>1.4.8</version>
 
     <repositories>
         <repository>
@@ -12,7 +12,7 @@
         </repository>
         <repository>
             <id>xuan</id>
-            <url>http://xuan.nctu.me:8081/repository/Maven/</url>
+            <url>https://xuan.nctu.me:8081/repository/Maven/</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.hypernite.mc</groupId>
             <artifactId>core-api</artifactId>
-            <version>7.6.1</version>
+            <version>7.6.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

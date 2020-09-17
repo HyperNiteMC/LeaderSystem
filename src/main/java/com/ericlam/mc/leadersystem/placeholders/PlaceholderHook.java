@@ -22,7 +22,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
     private final Plugin plugin;
     private final CacheManager cacheManager;
     private final LeadersConfig leadersConfig;
-    private int selectLimit;
+    private final int selectLimit;
 
     public PlaceholderHook(LeaderSystem plugin) {
         this.plugin = plugin;

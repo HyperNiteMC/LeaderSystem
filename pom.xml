@@ -11,8 +11,8 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>xuan</id>
-            <url>https://xuan.nctu.me:8081/repository/Maven/</url>
+            <id>hypernite</id>
+            <url>https://nexus.chu77.xyz/repository/developer/</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.hypernite.mc</groupId>
             <artifactId>core-api</artifactId>
-            <version>7.6.2</version>
+            <version>7.6.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

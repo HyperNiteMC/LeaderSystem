@@ -13,12 +13,15 @@ import com.hypernite.mc.hnmc.core.managers.YamlManager;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class LeaderSystem extends JavaPlugin {
 
     private YamlManager yamlManager;
     private CacheManager cacheManager;
     private LoadManager loadManager;
     private SignManager signManager;
+    private final ConcurrentLinkedQueue<String> itemQueue = new ConcurrentLinkedQueue<>();
 
     public YamlManager getYamlManager() {
         return yamlManager;
@@ -34,6 +37,10 @@ public class LeaderSystem extends JavaPlugin {
 
     public SignManager getSignManager() {
         return signManager;
+    }
+
+    public ConcurrentLinkedQueue<String> getItemQueue() {
+        return itemQueue;
     }
 
     @Override

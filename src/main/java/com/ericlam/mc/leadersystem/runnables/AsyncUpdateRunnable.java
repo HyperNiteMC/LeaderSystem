@@ -19,7 +19,7 @@ public class AsyncUpdateRunnable extends BukkitRunnable {
     private final SignManager signManager;
 
     public AsyncUpdateRunnable(LeaderSystem system, String item) {
-        this(system, of(item));
+        this(system, of(system, item));
     }
 
     public AsyncUpdateRunnable(LeaderSystem system, ConcurrentLinkedQueue<String> items) {
@@ -30,10 +30,9 @@ public class AsyncUpdateRunnable extends BukkitRunnable {
         this.signManager = system.getSignManager();
     }
 
-    private static ConcurrentLinkedQueue<String> of(String item) {
-        var queue = new ConcurrentLinkedQueue<String>();
-        queue.offer(item);
-        return queue;
+    private static ConcurrentLinkedQueue<String> of(LeaderSystem system, String item) {
+        system.getItemQueue().offer(item);
+        return system.getItemQueue();
     }
 
     @Override

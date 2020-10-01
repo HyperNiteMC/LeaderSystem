@@ -73,4 +73,9 @@ public class PlaceholderHook extends PlaceholderExpansion {
     public @NotNull String getVersion() {
         return plugin.getDescription().getVersion();
     }
+
+    @Override
+    public boolean persist() {
+        return true;
+    }
 }

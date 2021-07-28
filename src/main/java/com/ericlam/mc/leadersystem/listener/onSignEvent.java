@@ -73,8 +73,7 @@ public class onSignEvent implements Listener {
             return;
         }
 
-        Sign signState = (Sign) sign.getState(false);
-        signManager.updateSign(signState, player.getFacing().getOppositeFace());
+        signManager.createSign(sign, player, leaderSign);
         player.sendMessage(msg.get("sign-create-success"));
 
     }
@@ -82,8 +81,9 @@ public class onSignEvent implements Listener {
     @EventHandler
     public void onSignBreak(BlockBreakEvent e) {
         if (!(e.getBlock().getState() instanceof Sign)) return;
+        Sign sign = (Sign) e.getBlock().getState();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            signManager.removeSign((Sign) e.getBlock().getState());
+            signManager.removeSign(sign);
             e.getPlayer().sendMessage(msg.get("sign-removed"));
         });
     }

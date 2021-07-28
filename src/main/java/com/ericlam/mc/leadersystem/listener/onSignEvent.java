@@ -74,7 +74,7 @@ public class onSignEvent implements Listener {
         }
 
         signManager.createSign(sign, player, leaderSign);
-        signManager.updateSign((Sign) sign.getState(), player.getFacing().getOppositeFace());
+        signManager.updateSign((Sign) sign.getState(false), player.getFacing().getOppositeFace());
         player.sendMessage(msg.get("sign-create-success"));
 
     }
